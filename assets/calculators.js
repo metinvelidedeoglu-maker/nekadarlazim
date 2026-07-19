@@ -1,0 +1,585 @@
+import { addShoppingItem } from "./shopping-list.js";
+
+const trNumber = new Intl.NumberFormat("tr-TR", {
+  maximumFractionDigits: 2,
+});
+
+const tools = {
+  boya: {
+    title: "Boya Hesaplama",
+    subtitle: "Odanız için gereken yaklaşık boya miktarını hesaplayın.",
+    button: "Boyayı hesapla",
+    fields: [
+      { key: "length", label: "Oda uzunluğu", unit: "m", value: 5, min: 0.1, step: 0.1 },
+      { key: "width", label: "Oda genişliği", unit: "m", value: 4, min: 0.1, step: 0.1 },
+      { key: "height", label: "Duvar yüksekliği", unit: "m", value: 2.7, min: 0.1, step: 0.1 },
+      { key: "doorArea", label: "Toplam kapı alanı", unit: "m²", value: 2, min: 0, step: 0.1 },
+      { key: "windowArea", label: "Toplam pencere alanı", unit: "m²", value: 3, min: 0, step: 0.1 },
+      { key: "coats", label: "Kat sayısı", unit: "kat", value: 2, min: 1, step: 1 },
+      { key: "coverage", label: "Boyanın kapatıcılığı", unit: "m²/L", value: 10, min: 1, step: 0.5 },
+      { key: "waste", label: "Fire payı", unit: "%", value: 10, min: 0, max: 50, step: 1 },
+      { key: "canSize", label: "Boya ambalajı", unit: "L", value: 10, min: 0.1, step: 0.1 },
+      { key: "canPrice", label: "Ambalaj fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
+    ],
+    calculate: calculatePaint,
+  },
+  parke: {
+    title: "Parke Hesaplama",
+    subtitle: "Odanız için gereken parke alanını ve paket sayısını bulun.",
+    button: "Parkeyi hesapla",
+    fields: [
+      { key: "length", label: "Oda uzunluğu", unit: "m", value: 5, min: 0.1, step: 0.1 },
+      { key: "width", label: "Oda genişliği", unit: "m", value: 4, min: 0.1, step: 0.1 },
+      { key: "packArea", label: "Bir paketin kapladığı alan", unit: "m²", value: 1.84, min: 0.1, step: 0.01 },
+      { key: "waste", label: "Kesim ve fire payı", unit: "%", value: 10, min: 0, max: 50, step: 1 },
+      { key: "packPrice", label: "Paket fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
+    ],
+    calculate: calculateParquet,
+  },
+  seramik: {
+    title: "Seramik Hesaplama",
+    subtitle: "Zemin veya duvar için gereken seramik adedini hesaplayın.",
+    button: "Seramiği hesapla",
+    fields: [
+      { key: "length", label: "Uygulama uzunluğu", unit: "m", value: 4, min: 0.1, step: 0.1 },
+      { key: "width", label: "Uygulama genişliği", unit: "m", value: 3, min: 0.1, step: 0.1 },
+      { key: "tileWidth", label: "Seramik genişliği", unit: "cm", value: 60, min: 1, step: 1 },
+      { key: "tileHeight", label: "Seramik yüksekliği", unit: "cm", value: 60, min: 1, step: 1 },
+      { key: "piecesPerBox", label: "Kutudaki seramik adedi", unit: "adet", value: 4, min: 1, step: 1 },
+      { key: "waste", label: "Kesim ve fire payı", unit: "%", value: 10, min: 0, max: 50, step: 1 },
+      { key: "boxPrice", label: "Kutu fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
+    ],
+    calculate: calculateTile,
+  },
+  "duvar-kagidi": {
+    title: "Duvar Kâğıdı Hesaplama",
+    subtitle: "Duvar ölçülerine göre gereken rulo sayısını hesaplayın.",
+    button: "Ruloyu hesapla",
+    fields: [
+      { key: "totalWallWidth", label: "Kaplanacak toplam duvar genişliği", unit: "m", value: 18, min: 0.1, step: 0.1 },
+      { key: "wallHeight", label: "Duvar yüksekliği", unit: "m", value: 2.7, min: 0.1, step: 0.1 },
+      { key: "rollWidth", label: "Rulo genişliği", unit: "cm", value: 53, min: 1, step: 1 },
+      { key: "rollLength", label: "Rulo uzunluğu", unit: "m", value: 10, min: 0.1, step: 0.1 },
+      { key: "patternRepeat", label: "Desen tekrarı", unit: "cm", value: 0, min: 0, step: 1 },
+      { key: "trim", label: "Şerit başına kesim payı", unit: "cm", value: 10, min: 0, step: 1 },
+      { key: "rollPrice", label: "Rulo fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
+    ],
+    calculate: calculateWallpaper,
+  },
+  "duvar-paneli": {
+    title: "Duvar Paneli Hesaplama",
+    subtitle: "Duvarınız için gereken panel adedini kolayca bulun.",
+    button: "Paneli hesapla",
+    fields: [
+      { key: "wallWidth", label: "Duvar genişliği", unit: "m", value: 4, min: 0.1, step: 0.1 },
+      { key: "wallHeight", label: "Duvar yüksekliği", unit: "m", value: 2.7, min: 0.1, step: 0.1 },
+      { key: "panelWidth", label: "Panel genişliği", unit: "cm", value: 60, min: 1, step: 1 },
+      { key: "panelHeight", label: "Panel yüksekliği", unit: "cm", value: 280, min: 1, step: 1 },
+      { key: "waste", label: "Yedek ve fire payı", unit: "%", value: 5, min: 0, max: 50, step: 1 },
+      { key: "piecePrice", label: "Panel fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
+    ],
+    calculate: calculateWallPanel,
+  },
+  beton: {
+    title: "Beton Hacmi Hesaplama",
+    subtitle: "Döşeme veya temel için gereken beton hacmini hesaplayın.",
+    button: "Betonu hesapla",
+    fields: [
+      { key: "length", label: "Uzunluk", unit: "m", value: 5, min: 0.1, step: 0.1 },
+      { key: "width", label: "Genişlik", unit: "m", value: 3, min: 0.1, step: 0.1 },
+      { key: "thickness", label: "Kalınlık", unit: "cm", value: 10, min: 1, step: 1 },
+      { key: "bagYield", label: "Hazır karışım torbası verimi", unit: "L", value: 12, min: 1, step: 0.5 },
+      { key: "waste", label: "Fire payı", unit: "%", value: 8, min: 0, max: 50, step: 1 },
+      { key: "pricePerM3", label: "Hazır beton fiyatı (isteğe bağlı)", unit: "TL/m³", value: 0, min: 0, step: 0.01 },
+      { key: "bagPrice", label: "Torba fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
+    ],
+    calculate: calculateConcrete,
+  },
+  tugla: {
+    title: "Tuğla ve Blok Hesaplama",
+    subtitle: "Duvar alanına göre gereken tuğla veya blok adedini bulun.",
+    button: "Tuğlayı hesapla",
+    fields: [
+      { key: "wallWidth", label: "Duvar genişliği", unit: "m", value: 5, min: 0.1, step: 0.1 },
+      { key: "wallHeight", label: "Duvar yüksekliği", unit: "m", value: 2.7, min: 0.1, step: 0.1 },
+      { key: "openingArea", label: "Kapı ve pencere alanı", unit: "m²", value: 2, min: 0, step: 0.1 },
+      { key: "blockWidth", label: "Tuğla/blok uzunluğu", unit: "cm", value: 19, min: 1, step: 0.5 },
+      { key: "blockHeight", label: "Tuğla/blok yüksekliği", unit: "cm", value: 13.5, min: 1, step: 0.5 },
+      { key: "joint", label: "Derz kalınlığı", unit: "mm", value: 10, min: 0, step: 1 },
+      { key: "waste", label: "Kırılma ve fire payı", unit: "%", value: 8, min: 0, max: 50, step: 1 },
+      { key: "piecePrice", label: "Tuğla/blok fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
+    ],
+    calculate: calculateBrick,
+  },
+  supurgelik: {
+    title: "Süpürgelik Hesaplama",
+    subtitle: "Oda çevresine göre gereken süpürgelik boyunu hesaplayın.",
+    button: "Süpürgeliği hesapla",
+    fields: [
+      { key: "length", label: "Oda uzunluğu", unit: "m", value: 5, min: 0.1, step: 0.1 },
+      { key: "width", label: "Oda genişliği", unit: "m", value: 4, min: 0.1, step: 0.1 },
+      { key: "doorWidth", label: "Toplam kapı genişliği", unit: "m", value: 0.9, min: 0, step: 0.1 },
+      { key: "pieceLength", label: "Bir süpürgelik boyu", unit: "m", value: 2.4, min: 0.1, step: 0.1 },
+      { key: "waste", label: "Kesim ve fire payı", unit: "%", value: 10, min: 0, max: 50, step: 1 },
+      { key: "piecePrice", label: "Bir boyun fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
+    ],
+    calculate: calculateSkirting,
+  },
+  perde: {
+    title: "Perde Kumaşı Hesaplama",
+    subtitle: "Pile oranına göre gereken yaklaşık perde kumaşını bulun.",
+    button: "Kumaşı hesapla",
+    fields: [
+      { key: "railWidth", label: "Korniş veya ray genişliği", unit: "m", value: 3, min: 0.1, step: 0.1 },
+      {
+        key: "fullness",
+        label: "Pile sıklığı",
+        unit: "kat",
+        value: 2.5,
+        type: "select",
+        options: [
+          { value: 1.5, label: "Seyrek pile — 1,5 kat" },
+          { value: 2, label: "Orta pile — 2 kat" },
+          { value: 2.5, label: "Sık pile — 2,5 kat" },
+          { value: 3, label: "Çok sık pile — 3 kat" },
+        ],
+      },
+      { key: "panelCount", label: "Perde parçası", unit: "adet", value: 2, min: 1, step: 1 },
+      { key: "sideHem", label: "Her parçada toplam yan kıvırma", unit: "cm", value: 20, min: 0, step: 1 },
+      { key: "meterPrice", label: "Kumaş metre fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
+    ],
+    calculate: calculateCurtain,
+  },
+  elektrik: {
+    title: "Elektrik Tüketimi Hesaplama",
+    subtitle: "Bir cihazın aylık elektrik tüketimini ve maliyetini hesaplayın.",
+    button: "Tüketimi hesapla",
+    fields: [
+      { key: "watts", label: "Cihaz gücü", unit: "W", value: 1500, min: 0, step: 1 },
+      { key: "count", label: "Cihaz adedi", unit: "adet", value: 1, min: 1, step: 1 },
+      { key: "hoursPerDay", label: "Günlük kullanım", unit: "saat", value: 3, min: 0, max: 24, step: 0.1 },
+      { key: "daysPerMonth", label: "Aylık kullanım", unit: "gün", value: 30, min: 1, max: 31, step: 1 },
+      { key: "pricePerKwh", label: "Elektrik birim fiyatı", unit: "₺/kWh", value: 2.6, min: 0, step: 0.01 },
+    ],
+    calculate: calculateElectricity,
+  },
+};
+
+export function parseLocaleNumber(value) {
+  if (typeof value === "number") return Number.isFinite(value) ? value : Number.NaN;
+
+  let normalized = String(value ?? "").trim().replace(/\s/g, "");
+  if (!normalized) return Number.NaN;
+
+  if (normalized.includes(",") && normalized.includes(".")) {
+    if (normalized.lastIndexOf(",") > normalized.lastIndexOf(".")) {
+      normalized = normalized.replaceAll(".", "").replace(",", ".");
+    } else {
+      normalized = normalized.replaceAll(",", "");
+    }
+  } else {
+    normalized = normalized.replace(",", ".");
+  }
+
+  const number = Number(normalized);
+  return Number.isFinite(number) ? number : Number.NaN;
+}
+
+function positive(value) {
+  const number = parseLocaleNumber(value);
+  return Number.isFinite(number) ? number : 0;
+}
+
+function withWaste(value, waste) {
+  return value * (1 + positive(waste) / 100);
+}
+
+function rounded(value, digits = 2) {
+  const factor = 10 ** digits;
+  return Math.round((value + Number.EPSILON) * factor) / factor;
+}
+
+function estimatedCost(total, unitPrice) {
+  return positive(unitPrice) > 0 ? `${trNumber.format(rounded(total, 2))} TL` : "Fiyat girilmedi";
+}
+
+export function calculatePaint(input) {
+  const grossArea = 2 * (positive(input.length) + positive(input.width)) * positive(input.height);
+  const netArea = Math.max(0, grossArea - positive(input.doorArea) - positive(input.windowArea));
+  const coatedArea = netArea * Math.max(1, positive(input.coats));
+  const liters = withWaste(coatedArea / Math.max(0.01, positive(input.coverage)), input.waste);
+  const canSize = positive(input.canSize) > 0 ? positive(input.canSize) : 10;
+  const cans = Math.ceil(liters / canSize);
+  const purchasedLiters = cans * canSize;
+
+  return result(
+    `${trNumber.format(rounded(liters, 1))} litre boya`,
+    "Önerilen yaklaşık miktar",
+    [
+      ["Boyanacak net duvar", `${trNumber.format(rounded(netArea))} m²`],
+      ["Katlarla birlikte alan", `${trNumber.format(rounded(coatedArea))} m²`],
+      ["Fire dahil boya", `${trNumber.format(rounded(liters, 1))} L`],
+      ["Satın alınacak ambalaj", `${trNumber.format(cans)} × ${trNumber.format(rounded(canSize, 1))} L`],
+      ["Satın alınan toplam", `${trNumber.format(rounded(purchasedLiters, 1))} L`],
+      ["Tahmini boya bedeli", estimatedCost(cans * positive(input.canPrice), input.canPrice)],
+    ],
+    "Yüzey emiciliği, renk değişimi ve boya türü gerçek tüketimi etkileyebilir."
+  );
+}
+
+export function calculateParquet(input) {
+  const area = positive(input.length) * positive(input.width);
+  const requiredArea = withWaste(area, input.waste);
+  const packs = Math.ceil(requiredArea / Math.max(0.01, positive(input.packArea)));
+
+  return result(
+    `${trNumber.format(packs)} paket parke`,
+    "Satın alınması önerilen miktar",
+    [
+      ["Net zemin alanı", `${trNumber.format(rounded(area))} m²`],
+      ["Fire dahil ihtiyaç", `${trNumber.format(rounded(requiredArea))} m²`],
+      ["Paketlerin toplam alanı", `${trNumber.format(rounded(packs * positive(input.packArea)))} m²`],
+      ["Tahmini parke bedeli", estimatedCost(packs * positive(input.packPrice), input.packPrice)],
+    ],
+    "Çapraz döşeme veya çok girintili alanlarda fire oranını yükseltin."
+  );
+}
+
+export function calculateTile(input) {
+  const area = positive(input.length) * positive(input.width);
+  const requiredArea = withWaste(area, input.waste);
+  const tileArea = (positive(input.tileWidth) / 100) * (positive(input.tileHeight) / 100);
+  const pieces = Math.ceil(requiredArea / Math.max(0.0001, tileArea));
+  const boxes = Math.ceil(pieces / Math.max(1, positive(input.piecesPerBox)));
+
+  return result(
+    `${trNumber.format(boxes)} kutu seramik`,
+    `${trNumber.format(pieces)} adet yaklaşık ihtiyaç`,
+    [
+      ["Net uygulama alanı", `${trNumber.format(rounded(area))} m²`],
+      ["Fire dahil alan", `${trNumber.format(rounded(requiredArea))} m²`],
+      ["Kutudaki adet", `${trNumber.format(positive(input.piecesPerBox))} adet`],
+      ["Satın alınan toplam", `${trNumber.format(boxes * Math.max(1, positive(input.piecesPerBox)))} adet`],
+      ["Tahmini seramik bedeli", estimatedCost(boxes * positive(input.boxPrice), input.boxPrice)],
+    ],
+    "Kutu hesabı, girdiğiniz kutu içi adet üzerinden yapılır."
+  );
+}
+
+export function calculateWallpaper(input) {
+  const rollWidthM = positive(input.rollWidth) / 100;
+  const repeatM = positive(input.patternRepeat) / 100;
+  const trimM = positive(input.trim) / 100;
+  const rawStrip = positive(input.wallHeight) + trimM;
+  const stripLength = repeatM > 0 ? Math.ceil(rawStrip / repeatM) * repeatM : rawStrip;
+  const stripsNeeded = Math.ceil(positive(input.totalWallWidth) / Math.max(0.01, rollWidthM));
+  const stripsPerRoll = Math.max(1, Math.floor(positive(input.rollLength) / Math.max(0.01, stripLength)));
+  const rolls = Math.ceil(stripsNeeded / stripsPerRoll);
+
+  return result(
+    `${trNumber.format(rolls)} rulo duvar kâğıdı`,
+    "Önerilen yaklaşık miktar",
+    [
+      ["Gereken şerit", `${trNumber.format(stripsNeeded)} adet`],
+      ["Bir şeridin kesim boyu", `${trNumber.format(rounded(stripLength))} m`],
+      ["Bir rulodan çıkan", `${trNumber.format(stripsPerRoll)} şerit`],
+      ["Tahmini duvar kâğıdı bedeli", estimatedCost(rolls * positive(input.rollPrice), input.rollPrice)],
+    ],
+    "Desen eşleştirme ve duvar girintileri rulo ihtiyacını artırabilir."
+  );
+}
+
+export function calculateWallPanel(input) {
+  const columns = Math.ceil(positive(input.wallWidth) / Math.max(0.01, positive(input.panelWidth) / 100));
+  const rows = Math.ceil(positive(input.wallHeight) / Math.max(0.01, positive(input.panelHeight) / 100));
+  const basePieces = columns * rows;
+  const pieces = Math.ceil(withWaste(basePieces, input.waste));
+  const wallArea = positive(input.wallWidth) * positive(input.wallHeight);
+
+  return result(
+    `${trNumber.format(pieces)} adet panel`,
+    "Yedek payı dahil önerilen miktar",
+    [
+      ["Duvar alanı", `${trNumber.format(rounded(wallArea))} m²`],
+      ["Yatayda panel", `${trNumber.format(columns)} adet`],
+      ["Dikeyde sıra", `${trNumber.format(rows)} sıra`],
+      ["Tahmini panel bedeli", estimatedCost(pieces * positive(input.piecePrice), input.piecePrice)],
+    ],
+    "Hesap, panellerin dikey ve tam ölçülü yerleşimine göre yapılır."
+  );
+}
+
+export function calculateConcrete(input) {
+  const netVolume = positive(input.length) * positive(input.width) * (positive(input.thickness) / 100);
+  const orderVolume = withWaste(netVolume, input.waste);
+  const bags = Math.ceil((orderVolume * 1000) / Math.max(0.1, positive(input.bagYield)));
+
+  return result(
+    `${trNumber.format(rounded(orderVolume, 2))} m³ beton`,
+    "Fire dahil yaklaşık sipariş hacmi",
+    [
+      ["Net hacim", `${trNumber.format(rounded(netVolume, 2))} m³`],
+      ["Litre karşılığı", `${trNumber.format(Math.ceil(orderVolume * 1000))} L`],
+      ["Hazır karışım torbası", `${trNumber.format(bags)} adet`],
+      ["Hazır beton tahmini", estimatedCost(orderVolume * positive(input.pricePerM3), input.pricePerM3)],
+      ["Torbalı karışım tahmini", estimatedCost(bags * positive(input.bagPrice), input.bagPrice)],
+    ],
+    "Taşıyıcı beton uygulamalarında sınıf ve miktar için mutlaka uzman görüşü alın."
+  );
+}
+
+export function calculateBrick(input) {
+  const grossArea = positive(input.wallWidth) * positive(input.wallHeight);
+  const netArea = Math.max(0, grossArea - positive(input.openingArea));
+  const jointM = positive(input.joint) / 1000;
+  const moduleArea = (positive(input.blockWidth) / 100 + jointM) * (positive(input.blockHeight) / 100 + jointM);
+  const basePieces = netArea / Math.max(0.0001, moduleArea);
+  const pieces = Math.ceil(withWaste(basePieces, input.waste));
+
+  return result(
+    `${trNumber.format(pieces)} adet tuğla/blok`,
+    "Fire dahil yaklaşık miktar",
+    [
+      ["Brüt duvar alanı", `${trNumber.format(rounded(grossArea))} m²`],
+      ["Net örülecek alan", `${trNumber.format(rounded(netArea))} m²`],
+      ["Metrekare başına", `${trNumber.format(rounded(1 / Math.max(0.0001, moduleArea), 1))} adet`],
+      ["Tahmini tuğla/blok bedeli", estimatedCost(pieces * positive(input.piecePrice), input.piecePrice)],
+    ],
+    "Ürün ölçüsü ve uygulama biçimi üretici tavsiyesine göre kontrol edilmelidir."
+  );
+}
+
+export function calculateSkirting(input) {
+  const perimeter = 2 * (positive(input.length) + positive(input.width));
+  const netLength = Math.max(0, perimeter - positive(input.doorWidth));
+  const requiredLength = withWaste(netLength, input.waste);
+  const pieces = Math.ceil(requiredLength / Math.max(0.01, positive(input.pieceLength)));
+
+  return result(
+    `${trNumber.format(pieces)} boy süpürgelik`,
+    "Satın alınması önerilen miktar",
+    [
+      ["Oda çevresi", `${trNumber.format(rounded(perimeter))} m`],
+      ["Kapılar çıktıktan sonra", `${trNumber.format(rounded(netLength))} m`],
+      ["Fire dahil ihtiyaç", `${trNumber.format(rounded(requiredLength))} m`],
+      ["Satın alınan toplam", `${trNumber.format(rounded(pieces * positive(input.pieceLength)))} m`],
+      ["Tahmini süpürgelik bedeli", estimatedCost(pieces * positive(input.piecePrice), input.piecePrice)],
+    ],
+    "Köşe sayısı arttıkça kesim firesi artabilir."
+  );
+}
+
+export function calculateCurtain(input) {
+  const finishedWidth = positive(input.railWidth) * positive(input.fullness);
+  const hemAllowance = (positive(input.sideHem) / 100) * Math.max(1, positive(input.panelCount));
+  const fabricMeters = finishedWidth + hemAllowance;
+
+  return result(
+    `${trNumber.format(rounded(fabricMeters, 1))} metre kumaş`,
+    "Boydan kumaş için yaklaşık ihtiyaç",
+    [
+      ["Pileli toplam genişlik", `${trNumber.format(rounded(finishedWidth, 1))} m`],
+      ["Yan kıvırma payı", `${trNumber.format(rounded(hemAllowance, 1))} m`],
+      ["Pile oranı", `${trNumber.format(positive(input.fullness))} kat`],
+      ["Tahmini kumaş bedeli", estimatedCost(fabricMeters * positive(input.meterPrice), input.meterPrice)],
+    ],
+    "Hesap, yüksekliği yeterli boydan perde kumaşı içindir; desen ve dikim payı ayrıca kontrol edilmelidir."
+  );
+}
+
+export function calculateElectricity(input) {
+  const monthlyKwh = (positive(input.watts) * positive(input.count) * positive(input.hoursPerDay) * positive(input.daysPerMonth)) / 1000;
+  const monthlyCost = monthlyKwh * positive(input.pricePerKwh);
+  const annualCost = monthlyCost * 12;
+
+  return result(
+    `${trNumber.format(rounded(monthlyCost, 2))} TL / ay`,
+    "Tahmini aylık elektrik maliyeti",
+    [
+      ["Aylık tüketim", `${trNumber.format(rounded(monthlyKwh, 2))} kWh`],
+      ["Günlük tüketim", `${trNumber.format(rounded(monthlyKwh / Math.max(1, positive(input.daysPerMonth)), 2))} kWh`],
+      ["Yıllık tahmin", `${trNumber.format(rounded(annualCost, 2))} TL`],
+    ],
+    "Tarifenizdeki güncel vergiler ve kademeler gerçek faturayı değiştirebilir."
+  );
+}
+
+function result(headline, eyebrow, items, note) {
+  return { headline, eyebrow, items, note };
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function renderField(field) {
+  const id = `field-${field.key}`;
+  const unit = field.unit ? `<span class="field-unit">${escapeHtml(field.unit)}</span>` : "";
+
+  if (field.type === "select") {
+    const options = field.options
+      .map((option) => `<option value="${escapeHtml(option.value)}" ${Number(option.value) === Number(field.value) ? "selected" : ""}>${escapeHtml(option.label)}</option>`)
+      .join("");
+    return `<label class="field" for="${id}"><span>${escapeHtml(field.label)}</span><select id="${id}" name="${escapeHtml(field.key)}">${options}</select></label>`;
+  }
+
+  const displayValue = String(field.value).replace(".", ",");
+  return `<label class="field" for="${id}">
+    <span>${escapeHtml(field.label)}</span>
+    <span class="input-wrap">
+      <input id="${id}" name="${escapeHtml(field.key)}" type="text" value="${escapeHtml(displayValue)}" inputmode="decimal" autocomplete="off" spellcheck="false" required>
+      ${unit}
+    </span>
+  </label>`;
+}
+
+function renderResult(calculation) {
+  return `<div class="result-heading">
+      <span>${escapeHtml(calculation.eyebrow)}</span>
+      <strong>${escapeHtml(calculation.headline)}</strong>
+    </div>
+    <dl class="result-list">
+      ${calculation.items.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}
+    </dl>
+    <p class="result-note">${escapeHtml(calculation.note)}</p>
+    <div class="result-actions">
+      <button class="result-action add-result" type="button">+ Listeme ekle</button>
+      <button class="result-action share-result" type="button">Paylaş / kopyala</button>
+    </div>`;
+}
+
+function calculationText(tool, calculation, projectName) {
+  const title = projectName ? `${projectName} · ${tool.title}` : tool.title;
+  return `${title}\n${calculation.headline}\n${calculation.items.map(([label, value]) => `${label}: ${value}`).join("\n")}\n\n${calculation.note}`;
+}
+
+function readValues(tool, form) {
+  let firstError = "";
+  const values = {};
+
+  tool.fields.forEach((field) => {
+    const input = form.elements.namedItem(field.key);
+    const value = parseLocaleNumber(input?.value);
+    let error = "";
+
+    if (!Number.isFinite(value)) error = `${field.label} için geçerli bir sayı girin.`;
+    else if (field.min !== undefined && value < field.min) error = `${field.label} en az ${String(field.min).replace(".", ",")} olmalı.`;
+    else if (field.max !== undefined && value > field.max) error = `${field.label} en fazla ${String(field.max).replace(".", ",")} olmalı.`;
+
+    input?.setAttribute("aria-invalid", String(Boolean(error)));
+    input?.closest(".field")?.classList.toggle("is-invalid", Boolean(error));
+    if (error && !firstError) firstError = error;
+    values[field.key] = value;
+  });
+
+  return { values, error: firstError };
+}
+
+async function shareOrCopy(text) {
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: "Ne Kadar Lazım?", text });
+      return "Paylaşıldı";
+    } catch (error) {
+      if (error?.name === "AbortError") return "Paylaş / kopyala";
+    }
+  }
+
+  await navigator.clipboard.writeText(text);
+  return "Kopyalandı";
+}
+
+function initCalculator(root) {
+  const toolId = document.body.dataset.tool;
+  const tool = tools[toolId];
+  if (!tool) return;
+
+  root.innerHTML = `<div class="calculator-title"><span class="calculator-badge">Ücretsiz araç</span><h2>${escapeHtml(tool.title)}</h2><p>${escapeHtml(tool.subtitle)}</p></div>
+    <form class="calculator-form">
+      <div class="form-grid">
+        <label class="field project-field" for="field-project-name"><span>Alan / proje adı <small>(isteğe bağlı)</small></span><span class="input-wrap"><input id="field-project-name" name="projectName" type="text" maxlength="100" placeholder="Örn. Salon" autocomplete="off"></span></label>
+        ${tool.fields.map(renderField).join("")}
+      </div>
+      <button class="primary-button calculate-button" type="submit">${escapeHtml(tool.button)}</button>
+      <p class="live-hint">Değerleri değiştirdikçe sonuç otomatik yenilenir.</p>
+      <p class="form-message" role="alert" hidden></p>
+    </form>
+    <section class="calculator-result" aria-live="polite"></section>`;
+
+  const form = root.querySelector("form");
+  const resultRoot = root.querySelector(".calculator-result");
+
+  let liveTimer;
+
+  function updateResult() {
+    const { values, error } = readValues(tool, form);
+    const message = form.querySelector(".form-message");
+
+    if (error) {
+      message.textContent = error;
+      message.hidden = false;
+      resultRoot.innerHTML = `<p class="result-invalid">Sonucu yenilemek için işaretli alanı düzeltin.</p>`;
+      return false;
+    }
+
+    message.hidden = true;
+    const calculation = tool.calculate(values);
+    resultRoot.innerHTML = renderResult(calculation);
+    const projectName = form.elements.namedItem("projectName").value.trim();
+    const text = calculationText(tool, calculation, projectName);
+    const shareButton = resultRoot.querySelector(".share-result");
+    const addButton = resultRoot.querySelector(".add-result");
+
+    shareButton.addEventListener("click", async () => {
+      try {
+        shareButton.textContent = await shareOrCopy(text);
+        window.setTimeout(() => (shareButton.textContent = "Paylaş / kopyala"), 1800);
+      } catch {
+        shareButton.textContent = "Kopyalanamadı";
+      }
+    });
+
+    addButton.addEventListener("click", () => {
+      const items = addShoppingItem({
+        toolId,
+        title: tool.title,
+        projectName,
+        headline: calculation.headline,
+        items: calculation.items,
+        note: calculation.note,
+        createdAt: new Date().toISOString(),
+      });
+      window.dispatchEvent(new CustomEvent("nkl:list-changed", { detail: { items } }));
+      addButton.textContent = "✓ Listeye eklendi";
+      window.setTimeout(() => (addButton.textContent = "+ Listeme ekle"), 1800);
+    });
+
+    return true;
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    window.clearTimeout(liveTimer);
+    if (updateResult()) resultRoot.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+
+  form.addEventListener("input", (event) => {
+    if (event.target.name === "projectName") return;
+    window.clearTimeout(liveTimer);
+    liveTimer = window.setTimeout(updateResult, 180);
+  });
+
+  updateResult();
+}
+
+if (typeof document !== "undefined") {
+  const root = document.querySelector("#calculator-root");
+  if (root) initCalculator(root);
+}
+
+export { tools };
