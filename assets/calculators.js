@@ -6,8 +6,8 @@ const trNumber = new Intl.NumberFormat("tr-TR", {
 
 const tools = {
   boya: {
-    title: "Boya Hesaplama",
-    subtitle: "Odanız için gereken yaklaşık boya miktarını hesaplayın.",
+    title: "Duvar Boyası Hesaplama",
+    subtitle: "Odanızın duvarları için gereken yaklaşık boya miktarını hesaplayın. Tavan bu hesaba dahil değildir.",
     button: "Boyayı hesapla",
     fields: [
       { key: "length", label: "Oda uzunluğu", unit: "m", value: 5, min: 0.1, step: 0.1 },
@@ -16,7 +16,7 @@ const tools = {
       { key: "doorArea", label: "Toplam kapı alanı", unit: "m²", value: 2, min: 0, step: 0.1 },
       { key: "windowArea", label: "Toplam pencere alanı", unit: "m²", value: 3, min: 0, step: 0.1 },
       { key: "coats", label: "Kat sayısı", unit: "kat", value: 2, min: 1, step: 1 },
-      { key: "coverage", label: "Boyanın kapatıcılığı", unit: "m²/L", value: 10, min: 1, step: 0.5 },
+      { key: "coverage", label: "Tek katta kaplama alanı", unit: "m²/L", value: 10, min: 1, step: 0.5 },
       { key: "waste", label: "Fire payı", unit: "%", value: 10, min: 0, max: 50, step: 1 },
       { key: "canSize", label: "Boya ambalajı", unit: "L", value: 10, min: 0.1, step: 0.1 },
       { key: "canPrice", label: "Ambalaj fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
@@ -46,6 +46,7 @@ const tools = {
       { key: "tileWidth", label: "Seramik genişliği", unit: "cm", value: 60, min: 1, step: 1 },
       { key: "tileHeight", label: "Seramik yüksekliği", unit: "cm", value: 60, min: 1, step: 1 },
       { key: "piecesPerBox", label: "Kutudaki seramik adedi", unit: "adet", value: 4, min: 1, step: 1 },
+      { key: "boxArea", label: "Kutunun kapladığı alan", unit: "m²", value: 1.44, min: 0, step: 0.01 },
       { key: "waste", label: "Kesim ve fire payı", unit: "%", value: 10, min: 0, max: 50, step: 1 },
       { key: "boxPrice", label: "Kutu fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
     ],
@@ -159,7 +160,7 @@ const tools = {
       { key: "count", label: "Cihaz adedi", unit: "adet", value: 1, min: 1, step: 1 },
       { key: "hoursPerDay", label: "Günlük kullanım", unit: "saat", value: 3, min: 0, max: 24, step: 0.1 },
       { key: "daysPerMonth", label: "Aylık kullanım", unit: "gün", value: 30, min: 1, max: 31, step: 1 },
-      { key: "pricePerKwh", label: "Elektrik birim fiyatı", unit: "₺/kWh", value: 2.6, min: 0, step: 0.01 },
+      { key: "pricePerKwh", label: "Faturanızdaki birim fiyat (isteğe bağlı)", unit: "₺/kWh", value: 0, min: 0, step: 0.01 },
     ],
     calculate: calculateElectricity,
   },
@@ -250,7 +251,11 @@ export function calculateTile(input) {
   const requiredArea = withWaste(area, input.waste);
   const tileArea = (positive(input.tileWidth) / 100) * (positive(input.tileHeight) / 100);
   const pieces = Math.ceil(requiredArea / Math.max(0.0001, tileArea));
-  const boxes = Math.ceil(pieces / Math.max(1, positive(input.piecesPerBox)));
+  const piecesPerBox = Math.max(1, positive(input.piecesPerBox));
+  const statedBoxArea = positive(input.boxArea);
+  const calculatedBoxArea = tileArea * piecesPerBox;
+  const boxArea = statedBoxArea > 0 ? statedBoxArea : calculatedBoxArea;
+  const boxes = Math.ceil(requiredArea / Math.max(0.0001, boxArea));
 
   return result(
     `${trNumber.format(boxes)} kutu seramik`,
@@ -258,11 +263,14 @@ export function calculateTile(input) {
     [
       ["Net uygulama alanı", `${trNumber.format(rounded(area))} m²`],
       ["Fire dahil alan", `${trNumber.format(rounded(requiredArea))} m²`],
-      ["Kutudaki adet", `${trNumber.format(positive(input.piecesPerBox))} adet`],
-      ["Satın alınan toplam", `${trNumber.format(boxes * Math.max(1, positive(input.piecesPerBox)))} adet`],
+      ["Kutunun kapladığı alan", `${trNumber.format(rounded(boxArea))} m²`],
+      ["Kutudaki adet", `${trNumber.format(piecesPerBox)} adet`],
+      ["Satın alınan toplam", `${trNumber.format(rounded(boxes * boxArea))} m²`],
       ["Tahmini seramik bedeli", estimatedCost(boxes * positive(input.boxPrice), input.boxPrice)],
     ],
-    "Kutu hesabı, girdiğiniz kutu içi adet üzerinden yapılır."
+    statedBoxArea > 0
+      ? "Kutu hesabında ambalaj üzerindeki m² değeri esas alınır; ton ve kalibre kodlarını da kontrol edin."
+      : "Kutu m² değeri girilmediği için ürün ölçüsü ve kutu içi adet kullanıldı."
   );
 }
 
@@ -273,7 +281,19 @@ export function calculateWallpaper(input) {
   const rawStrip = positive(input.wallHeight) + trimM;
   const stripLength = repeatM > 0 ? Math.ceil(rawStrip / repeatM) * repeatM : rawStrip;
   const stripsNeeded = Math.ceil(positive(input.totalWallWidth) / Math.max(0.01, rollWidthM));
-  const stripsPerRoll = Math.max(1, Math.floor(positive(input.rollLength) / Math.max(0.01, stripLength)));
+  const stripsPerRoll = Math.floor(positive(input.rollLength) / Math.max(0.01, stripLength));
+
+  if (stripsPerRoll < 1) {
+    return result(
+      "Rulo uzunluğu yetersiz",
+      "Ölçüleri kontrol edin",
+      [
+        ["Gerekli şerit boyu", `${trNumber.format(rounded(stripLength))} m`],
+        ["Girilen rulo uzunluğu", `${trNumber.format(rounded(positive(input.rollLength)))} m`],
+      ],
+      "Bir tam şerit rulodan çıkmıyor. Daha uzun bir rulo seçin veya ölçüleri düzeltin."
+    );
+  }
   const rolls = Math.ceil(stripsNeeded / stripsPerRoll);
 
   return result(
@@ -392,13 +412,18 @@ export function calculateElectricity(input) {
   const monthlyCost = monthlyKwh * positive(input.pricePerKwh);
   const annualCost = monthlyCost * 12;
 
+  const hasPrice = positive(input.pricePerKwh) > 0;
+
   return result(
-    `${trNumber.format(rounded(monthlyCost, 2))} TL / ay`,
-    "Tahmini aylık elektrik maliyeti",
+    hasPrice
+      ? `${trNumber.format(rounded(monthlyCost, 2))} TL / ay`
+      : `${trNumber.format(rounded(monthlyKwh, 2))} kWh / ay`,
+    hasPrice ? "Tahmini aylık elektrik maliyeti" : "Tahmini aylık elektrik tüketimi",
     [
       ["Aylık tüketim", `${trNumber.format(rounded(monthlyKwh, 2))} kWh`],
       ["Günlük tüketim", `${trNumber.format(rounded(monthlyKwh / Math.max(1, positive(input.daysPerMonth)), 2))} kWh`],
-      ["Yıllık tahmin", `${trNumber.format(rounded(annualCost, 2))} TL`],
+      ["Aylık maliyet", hasPrice ? `${trNumber.format(rounded(monthlyCost, 2))} TL` : "Birim fiyat girilmedi"],
+      ["Yıllık maliyet", hasPrice ? `${trNumber.format(rounded(annualCost, 2))} TL` : "Birim fiyat girilmedi"],
     ],
     "Tarifenizdeki güncel vergiler ve kademeler gerçek faturayı değiştirebilir."
   );
