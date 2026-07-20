@@ -270,6 +270,10 @@ export function calculatePaint(input) {
     `${recommendation.warning} ${recommendation.reason} Duvar için ${wallCoats} kat ve yaklaşık ${trNumber.format(rounded(wallLiters, 1))} litre boya hesapladık. ${primerAdvice} ${ceilingAdvice} İstediğiniz renk tonunu mağazada markanın kartelasından seçip hazırlatabilir, ürünün ambalaj seçeneklerine göre miktarı yukarı tamamlayabilirsiniz.`.trim()
   );
   output.noteTitle = "Ne Kadar Lazım’ın önerisi";
+  output.readyState = {
+    title: "Hesabınız hazır",
+    subtitle: "Duvar, astar ve tavan ihtiyacınız aşağıda.",
+  };
   output.interpretation = recommendation.interpretation;
   return output;
 }
@@ -616,10 +620,11 @@ function renderField(field) {
 }
 
 function renderResult(calculation) {
-  return `<div class="result-heading">
-      <span>${escapeHtml(calculation.eyebrow)}</span>
-      <strong>${escapeHtml(calculation.headline)}</strong>
-    </div>
+  const heading = calculation.readyState
+    ? `<div class="result-ready"><span class="result-ready-icon" aria-hidden="true">✓</span><div><strong>${escapeHtml(calculation.readyState.title)}</strong><span>${escapeHtml(calculation.readyState.subtitle)}</span></div></div>`
+    : `<div class="result-heading"><span>${escapeHtml(calculation.eyebrow)}</span><strong>${escapeHtml(calculation.headline)}</strong></div>`;
+
+  return `${heading}
     <dl class="result-list">
       ${calculation.items.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}
     </dl>
