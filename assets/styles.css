@@ -850,6 +850,21 @@ body:not(.ads-enabled) .ad-slot {
   font-weight: 850;
 }
 
+body[data-tool="boya"] .result-list div:nth-child(6) {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+body[data-tool="boya"] .result-list div:nth-child(7) {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+body[data-tool="boya"] .result-list div:nth-child(8) {
+  grid-column: 3;
+  grid-row: 3;
+}
+
 .result-note {
   margin: 0.35rem 0 0;
   color: rgba(255, 255, 255, 0.82);
@@ -1327,6 +1342,13 @@ body:not(.ads-enabled) .ad-slot {
 
   .result-list {
     grid-template-columns: 1fr;
+  }
+
+  body[data-tool="boya"] .result-list div:nth-child(6),
+  body[data-tool="boya"] .result-list div:nth-child(7),
+  body[data-tool="boya"] .result-list div:nth-child(8) {
+    grid-column: auto;
+    grid-row: auto;
   }
 }
 
