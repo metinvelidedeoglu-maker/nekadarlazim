@@ -698,22 +698,48 @@ body:not(.ads-enabled) .ad-slot {
 
 .checkbox-field {
   grid-column: 1 / -1;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
-  min-height: 48px;
-  padding: 0.7rem 0.85rem;
-  background: var(--brand-soft);
-  border: 1px solid rgba(13, 124, 102, 0.2);
-  border-radius: 10px;
+  justify-self: start;
+  gap: 0.5rem;
+  min-height: auto;
+  padding: 0.2rem 0;
+  background: transparent;
+  border: 0;
   cursor: pointer;
 }
 
 .checkbox-field input {
-  width: 20px;
-  min-height: 20px;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
   padding: 0;
+  margin: 0;
   accent-color: var(--brand);
+}
+
+.form-guidance {
+  grid-column: 1 / -1;
+  padding: 0.9rem 1rem;
+  color: var(--ink-soft);
+  background: var(--background);
+  border-left: 3px solid var(--brand);
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+
+.form-guidance strong {
+  color: var(--ink);
+}
+
+.form-guidance ul {
+  margin: 0.45rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.form-guidance li + li {
+  margin-top: 0.25rem;
 }
 
 .field select {
