@@ -245,23 +245,30 @@ export function calculatePaint(input) {
       : "Gerekli görünmüyor";
   const ceilingStatus = ceilingCoats > 0 ? `${ceilingCoats} kat` : "Boyanmayacak";
   const ceilingAmount = ceilingCoats > 0 ? `${trNumber.format(rounded(ceilingLiters, 1))} L` : "0 L";
+  const ceilingAdvice = ceilingCoats > 0
+    ? `Tavan için standart ${ceilingStatus} uygulama ve yaklaşık ${ceilingAmount} tavan boyası hesaplandı.`
+    : "Tavanı boyamayacağınızı belirttiğiniz için tavan boyası ihtiyaca eklenmedi.";
+  const primerAdvice = recommendation.moistureProblem
+    ? "Aktif nem veya kabarma ihtimali nedeniyle astar miktarı vermedik; önce sorunun kaynağını giderin. Astar tek başına rutubet sorununu çözmez."
+    : primerLiters > 0
+      ? `${recommendation.primerLabel}; duvar için yaklaşık ${primerAmount} astar öngörüldü.`
+      : "Tarifinizde astar gerektiren belirgin bir durum algılanmadı; uygulama öncesinde yüzeyin sağlam, temiz ve kuru olduğunu kontrol edin.";
 
   const output = result(
     `${trNumber.format(rounded(totalLiters, 1))} litre toplam boya`,
     ceilingCoats > 0 ? "Duvar ve tavan için yaklaşık ihtiyaç" : "Duvar için yaklaşık ihtiyaç",
     [
-      ["Boyanacak net duvar", `${trNumber.format(rounded(netArea))} m²`],
-      ["Duvar kat sayısı", `${wallCoats} kat`],
-      ["Önerinin nedeni", recommendation.reason],
-      ["Duvar için gereken", `${trNumber.format(rounded(wallLiters, 1))} L`],
-      ["Tavan uygulaması", ceilingStatus],
-      ["Tavan için gereken", ceilingAmount],
-      ["Astar önerisi", recommendation.primerLabel],
-      ["Duvar astarı", primerAmount],
-      ["Toplam boya ihtiyacı", `${trNumber.format(rounded(totalLiters, 1))} L`],
+      ["Net Duvar Alanı", `${trNumber.format(rounded(netArea))} m²`],
+      ["Duvar Boyası Kaç Kat Uygulanmalı", `${wallCoats} kat`],
+      ["Duvar İçin Önerilen Boya Miktarı", `${trNumber.format(rounded(wallLiters, 1))} L`],
+      ["Duvar İçin Astar Önerisi", recommendation.primerLabel],
+      ["Duvar İçin Önerilen Astar Miktarı", primerAmount],
+      ["Net Tavan Alanı", `${trNumber.format(rounded(ceilingArea))} m²`],
+      ["Tavan İçin Önerilen Boya Miktarı", ceilingAmount],
     ],
-    `${recommendation.warning} ${recommendation.primerNote} İstediğiniz renk tonunu mağazada markanın kartelasından seçip hazırlatabilirsiniz. Ambalaj seçeneklerine göre miktarı yukarı tamamlayın.`.trim()
+    `${recommendation.warning} ${recommendation.reason} Duvar için ${wallCoats} kat ve yaklaşık ${trNumber.format(rounded(wallLiters, 1))} litre boya hesapladık. ${primerAdvice} ${ceilingAdvice} İstediğiniz renk tonunu mağazada markanın kartelasından seçip hazırlatabilir, ürünün ambalaj seçeneklerine göre miktarı yukarı tamamlayabilirsiniz.`.trim()
   );
+  output.noteTitle = "Ne Kadar Lazım’ın önerisi";
   output.interpretation = recommendation.interpretation;
   return output;
 }
@@ -615,7 +622,10 @@ function renderResult(calculation) {
     <dl class="result-list">
       ${calculation.items.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}
     </dl>
-    <p class="result-note">${escapeHtml(calculation.note)}</p>
+    <div class="result-advice">
+      ${calculation.noteTitle ? `<strong>${escapeHtml(calculation.noteTitle)}</strong>` : ""}
+      <p class="result-note">${escapeHtml(calculation.note)}</p>
+    </div>
     <div class="result-actions">
       <button class="result-action add-result" type="button">+ Listeme ekle</button>
       <button class="result-action share-result" type="button">Paylaş / kopyala</button>
