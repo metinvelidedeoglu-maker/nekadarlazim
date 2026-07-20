@@ -191,6 +191,32 @@ const tools = {
   },
 };
 
+const multiTools = {
+  boya: { label: "Oda", addLabel: "Oda ekle", repeat: ["length", "width", "height", "doorArea", "windowArea", "paintCeiling", "currentCondition", "desiredCondition"] },
+  parke: { label: "Oda", addLabel: "Oda ekle", repeat: ["length", "width", "layoutWaste"] },
+  seramik: { label: "Alan", addLabel: "Alan ekle", repeat: ["length", "width"] },
+  "duvar-kagidi": { label: "Duvar grubu", addLabel: "Duvar grubu ekle", repeat: ["totalWallWidth", "wallHeight"] },
+  "duvar-paneli": { label: "Duvar", addLabel: "Duvar ekle", repeat: ["wallWidth", "wallHeight"] },
+  beton: { label: "Bölüm", addLabel: "Beton bölümü ekle", repeat: ["length", "width", "thickness"] },
+  tugla: { label: "Duvar", addLabel: "Duvar ekle", repeat: ["wallWidth", "wallHeight", "openingArea"] },
+  supurgelik: { label: "Oda", addLabel: "Oda ekle", repeat: ["length", "width", "doorWidth"] },
+  perde: { label: "Pencere", addLabel: "Pencere ekle", repeat: ["railWidth", "panelCount", "sideHem"] },
+  elektrik: { label: "Cihaz", addLabel: "Cihaz ekle", repeat: ["watts", "count", "hoursPerDay", "daysPerMonth"] },
+};
+
+const toolTips = {
+  boya: ["Duvarları metre cinsinden ölçün.", "Kapı ve pencerelerin toplam alanını yaklaşık girebilirsiniz.", "Yeni sıva, rutubet ve koyu renk geçişini açıklamada belirtin.", "Tavan boyanmayacaksa işareti kaldırın.", "Aynı boya kullanılacak odaları tek projede toplayın.", "Son kat rengini küçük bir alanda denemek faydalıdır."],
+  parke: ["Paket m² bilgisini ürün ambalajından alın.", "Düz ve çapraz döşemeyi doğru seçin.", "Sabit dolap altında parke olmayacaksa o alanı ölçüden çıkarın.", "Tüm paketlerde aynı üretim serisini tercih edin.", "Artan birkaç parçayı ilerideki onarımlar için saklayın.", "Çok girintili odalarda uygulayıcıyla miktarı doğrulayın."],
+  seramik: ["Kutu üzerindeki toplam m² bilgisini esas alın.", "Duvar ve zemini ayrı alanlar olarak ekleyin.", "Ton ve kalibre kodları aynı kutuları seçin.", "Desenli veya çapraz döşemede kesim kaybı artabilir.", "Niş ve kolonları ayrıca ölçün.", "Yedek birkaç seramiği onarım için saklayın."],
+  "duvar-kagidi": ["Aynı yükseklikteki duvarların genişliklerini toplayabilirsiniz.", "Desen tekrarını rulo etiketinden alın.", "Kapı ve pencereleri çoğu küçük uygulamada düşmemek güvenlidir.", "Farklı parti rulolarda renk tonu değişebilir.", "İlk ve son şeritlerde ek kesim gerekebilir.", "Duvarın en yüksek noktasını ölçün."],
+  "duvar-paneli": ["Nominal değil gerçek kaplama ölçüsünü kullanın.", "Her duvarı ayrı eklemek köşe kesimlerini daha doğru gösterir.", "Priz ve anahtar yerlerini önceden işaretleyin.", "Köşe profillerini ayrıca planlayın.", "Panelleri montajdan önce ortamda dinlendirin.", "Kesim yönünü ürün desenine göre belirleyin."],
+  beton: ["Kalınlığı santimetre olarak girin.", "Farklı kalınlıktaki bölümleri ayrı ekleyin.", "Zemindeki kot farklarını ölçün.", "Torba verimini ambalajdan doğrulayın.", "Taşıyıcı işlerde mühendis görüşü alın.", "Pompa ve taşıma kayıplarını tedarikçiyle konuşun."],
+  tugla: ["Her duvarı ayrı ölçmek hata riskini azaltır.", "Kapı ve pencere boşluklarını çıkarın.", "Ürünün duvar yüzünde görünen ölçülerini kullanın.", "Derz kalınlığını uygulama sistemine göre seçin.", "Kırılma için yedek ürün bulundurun.", "Harç veya yapıştırıcı ihtiyacını ayrıca planlayın."],
+  supurgelik: ["Her odayı ayrı ekleyin.", "Süpürgelik gelmeyecek kapı genişliklerini çıkarın.", "Ürünün gerçek boyunu ambalajdan alın.", "Çok köşeli odalarda kesim artar.", "Köşe ve bitiş aksesuarlarını ayrıca sayın.", "Parke ile uyumlu seriyi önceden kontrol edin."],
+  perde: ["Kornişi duvardan duvara değil, gerçek ray boyunca ölçün.", "Her pencereyi ayrı ekleyin.", "Pile oranı arttıkça kumaş ihtiyacı artar.", "Desen tekrarlı kumaşlarda ek pay gerekebilir.", "Kumaş yüksekliğinin pencereye yettiğini kontrol edin.", "Kesimden önce ölçüyü terzinizle doğrulayın."],
+  elektrik: ["Her farklı cihazı ayrı ekleyin.", "Watt değerini cihaz etiketinden alın.", "Termostatlı cihazların sürekli tam güç çekmediğini unutmayın.", "Bekleme tüketimi gerçek sonucu artırabilir.", "Güncel birim fiyatı faturanızdan alın.", "Kademeli tarife ve vergiler faturayı değiştirebilir."],
+};
+
 export function parseLocaleNumber(value) {
   if (typeof value === "number") return Number.isFinite(value) ? value : Number.NaN;
 
@@ -610,8 +636,8 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function renderField(field) {
-  const id = `field-${field.key}`;
+function renderField(field, prefix = "") {
+  const id = `field-${prefix}${field.key}`;
   const unit = field.unit ? `<span class="field-unit">${escapeHtml(field.unit)}</span>` : "";
 
   if (field.type === "select") {
@@ -644,6 +670,14 @@ function renderResult(calculation) {
     ? `<div class="result-ready"><span class="result-ready-icon" aria-hidden="true">✓</span><div><strong>${escapeHtml(calculation.readyState.title)}</strong><span>${escapeHtml(calculation.readyState.subtitle)}</span></div></div>`
     : `<div class="result-heading"><span>${escapeHtml(calculation.eyebrow)}</span><strong>${escapeHtml(calculation.headline)}</strong></div>`;
 
+  const childResults = calculation.children
+    ? `<div class="multi-results">${calculation.children.map(({ name, calculation: child }) => `<section class="multi-result"><h3>${escapeHtml(name)}</h3>${renderResult({ ...child, children: undefined, hideActions: true })}</section>`).join("")}</div>`
+    : "";
+  const actions = calculation.hideActions ? "" : `<div class="result-actions">
+      <button class="result-action add-result" type="button">+ Listeme ekle</button>
+      <button class="result-action share-result" type="button">Paylaş / kopyala</button>
+    </div>`;
+
   return `${heading}
     <dl class="result-list">
       ${calculation.items.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}
@@ -652,10 +686,8 @@ function renderResult(calculation) {
       ${calculation.noteTitle ? `<strong>${escapeHtml(calculation.noteTitle)}</strong>` : ""}
       <p class="result-note">${escapeHtml(calculation.note)}</p>
     </div>
-    <div class="result-actions">
-      <button class="result-action add-result" type="button">+ Listeme ekle</button>
-      <button class="result-action share-result" type="button">Paylaş / kopyala</button>
-    </div>`;
+    ${childResults}
+    ${actions}`;
 }
 
 function calculationText(tool, calculation, projectName) {
@@ -663,12 +695,12 @@ function calculationText(tool, calculation, projectName) {
   return `${title}\n${calculation.headline}\n${calculation.items.map(([label, value]) => `${label}: ${value}`).join("\n")}\n\n${calculation.note}`;
 }
 
-function readValues(tool, form) {
+function readFields(fields, scope) {
   let firstError = "";
   const values = {};
 
-  tool.fields.forEach((field) => {
-    const input = form.elements.namedItem(field.key);
+  fields.forEach((field) => {
+    const input = scope.querySelector(`[name="${field.key}"]`);
     if (field.type === "checkbox") {
       values[field.key] = Boolean(input?.checked);
       return;
@@ -693,6 +725,28 @@ function readValues(tool, form) {
   return { values, error: firstError };
 }
 
+export function combineMultiResults(tool, entries) {
+  const calculations = entries.map((entry) => ({ name: entry.name, calculation: tool.calculate(entry.values) }));
+  if (calculations.length === 1) return calculations[0].calculation;
+
+  const headlineParts = calculations.map(({ calculation }) => calculation.headline.match(/^([\d.,]+)\s+(.+)$/)).filter(Boolean);
+  let headline = `${calculations.length} bölüm hesaplandı`;
+  if (headlineParts.length === calculations.length && headlineParts.every((part) => part[2] === headlineParts[0][2])) {
+    const total = headlineParts.reduce((sum, part) => sum + positive(part[1]), 0);
+    headline = `${trNumber.format(rounded(total, 2))} ${headlineParts[0][2]}`;
+  }
+
+  return {
+    headline,
+    eyebrow: "Toplu hesaplama",
+    items: [["Hesaplanan Bölüm Sayısı", `${calculations.length} adet`]],
+    note: `${calculations.length} bölüm ayrı ayrı hesaplandı. Aşağıdaki bölüm sonuçlarını kontrol edin; farklı ürün veya uygulama koşulları varsa miktarları ayrı değerlendirin.`,
+    noteTitle: "Ne Kadar Lazım’ın önerisi",
+    readyState: { title: "Toplu hesabınız hazır", subtitle: "Genel özet ve bölüm sonuçları aşağıda." },
+    children: calculations,
+  };
+}
+
 async function shareOrCopy(text) {
   if (navigator.share) {
     try {
@@ -711,20 +765,34 @@ function initCalculator(root) {
   const toolId = document.body.dataset.tool;
   const tool = tools[toolId];
   if (!tool) return;
+  const multi = multiTools[toolId];
+  const repeatFields = tool.fields.filter((field) => multi.repeat.includes(field.key));
+  const sharedFields = tool.fields.filter((field) => !multi.repeat.includes(field.key));
+
+  function renderEntry(index) {
+    return `<section class="multi-entry" data-entry-index="${index}">
+      <div class="multi-entry-heading"><h3>${escapeHtml(multi.label)} ${index + 1}</h3><button class="remove-entry" type="button" ${index === 0 ? "hidden" : ""} aria-label="Bu bölümü sil">Sil</button></div>
+      <label class="field entry-name-field"><span>${escapeHtml(multi.label)} adı <small>(isteğe bağlı)</small></span><span class="input-wrap"><input name="entryName" type="text" maxlength="60" placeholder="Örn. ${escapeHtml(multi.label)} ${index + 1}" autocomplete="off"></span></label>
+      <div class="form-grid entry-fields">${repeatFields.map((field) => renderField(field, `${index}-`)).join("")}</div>
+      ${tool.showInterpretation ? `<p class="interpretation-preview" aria-live="polite"></p>` : ""}
+    </section>`;
+  }
 
   root.innerHTML = `<div class="calculator-title"><span class="calculator-badge">Ücretsiz araç</span><h2>${escapeHtml(tool.title)}</h2><p>${escapeHtml(tool.subtitle)}</p></div>
     <form class="calculator-form">
       <div class="form-grid">
         <label class="field project-field" for="field-project-name"><span>Alan / proje adı <small>(isteğe bağlı)</small></span><span class="input-wrap"><input id="field-project-name" name="projectName" type="text" maxlength="100" placeholder="Örn. Salon" autocomplete="off"></span></label>
-        ${tool.fields.map(renderField).join("")}
-        ${tool.showInterpretation ? `<p class="interpretation-preview" aria-live="polite"></p>` : ""}
+        ${sharedFields.length ? `<div class="shared-fields form-grid">${sharedFields.map((field) => renderField(field, "shared-")).join("")}</div>` : ""}
+        <div class="multi-entry-list">${renderEntry(0)}</div>
+        <button class="add-entry" type="button">+ ${escapeHtml(multi.addLabel)}</button>
         ${tool.formGuidance ? `<div class="form-guidance"><strong>Doğru sonuç için</strong><ul>${tool.formGuidance.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></div>` : ""}
       </div>
       <button class="primary-button calculate-button" type="submit">${escapeHtml(tool.button)}</button>
       <p class="live-hint">Değerleri değiştirdikçe sonuç otomatik yenilenir.</p>
       <p class="form-message" role="alert" hidden></p>
     </form>
-    <section class="calculator-result" aria-live="polite"></section>`;
+    <section class="calculator-result" aria-live="polite"></section>
+    <section class="tool-tips"><h2>İşinizi kolaylaştıracak ipuçları</h2><ul>${toolTips[toolId].map((tip) => `<li>${escapeHtml(tip)}</li>`).join("")}</ul></section>`;
 
   const form = root.querySelector("form");
   const resultRoot = root.querySelector(".calculator-result");
@@ -732,7 +800,20 @@ function initCalculator(root) {
   let liveTimer;
 
   function updateResult() {
-    const { values, error } = readValues(tool, form);
+    const sharedRead = readFields(sharedFields, form);
+    let error = sharedRead.error;
+    const entries = [...form.querySelectorAll(".multi-entry")].map((entry, index) => {
+      const entryRead = readFields(repeatFields, entry);
+      if (!error && entryRead.error) error = entryRead.error;
+      const values = { ...sharedRead.values, ...entryRead.values };
+      const singleCalculation = tool.calculate(values);
+      const interpretation = entry.querySelector(".interpretation-preview");
+      if (interpretation) interpretation.textContent = `Yazdığınızdan anladığımız: ${singleCalculation.interpretation}`;
+      return {
+        name: entry.querySelector('[name="entryName"]').value.trim() || `${multi.label} ${index + 1}`,
+        values,
+      };
+    });
     const message = form.querySelector(".form-message");
 
     if (error) {
@@ -743,11 +824,9 @@ function initCalculator(root) {
     }
 
     message.hidden = true;
-    const calculation = tool.calculate(values);
-    const interpretation = form.querySelector(".interpretation-preview");
-    if (interpretation) interpretation.textContent = `Yazdığınızdan anladığımız: ${calculation.interpretation}`;
+    const calculation = combineMultiResults(tool, entries);
     resultRoot.innerHTML = renderResult(calculation);
-    const projectName = form.elements.namedItem("projectName").value.trim();
+    const projectName = form.querySelector('[name="projectName"]').value.trim();
     const text = calculationText(tool, calculation, projectName);
     const shareButton = resultRoot.querySelector(".share-result");
     const addButton = resultRoot.querySelector(".add-result");
@@ -786,9 +865,28 @@ function initCalculator(root) {
   });
 
   form.addEventListener("input", (event) => {
-    if (event.target.name === "projectName") return;
+    if (event.target.name === "projectName" || event.target.name === "entryName") return;
     window.clearTimeout(liveTimer);
     liveTimer = window.setTimeout(updateResult, 180);
+  });
+
+  form.querySelector(".add-entry").addEventListener("click", () => {
+    const list = form.querySelector(".multi-entry-list");
+    const index = list.children.length;
+    list.insertAdjacentHTML("beforeend", renderEntry(index));
+    updateResult();
+  });
+
+  form.addEventListener("click", (event) => {
+    const removeButton = event.target.closest(".remove-entry");
+    if (!removeButton) return;
+    removeButton.closest(".multi-entry").remove();
+    [...form.querySelectorAll(".multi-entry")].forEach((entry, index) => {
+      entry.dataset.entryIndex = String(index);
+      entry.querySelector("h3").textContent = `${multi.label} ${index + 1}`;
+      entry.querySelector(".remove-entry").hidden = index === 0;
+    });
+    updateResult();
   });
 
   updateResult();
@@ -799,4 +897,4 @@ if (typeof document !== "undefined") {
   if (root) initCalculator(root);
 }
 
-export { tools };
+export { tools, multiTools, toolTips };
