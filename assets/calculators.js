@@ -65,15 +65,11 @@ const tools = {
     title: "Seramik Hesaplama",
     subtitle: "Zemin veya duvar için gereken seramik adedini hesaplayın.",
     button: "Seramiği hesapla",
-    formGuidance: ["Kutu üzerindeki toplam m² bilgisini esas alın.", "Çapraz veya desenli döşemede fire payını yükseltin.", "Aynı alan için ton ve kalibre kodlarını eşleştirin."],
+    formGuidance: ["Kutu üzerindeki toplam m² bilgisini esas alın.", "Kesim ve kırılma payını sistem otomatik ekler.", "Aynı alan için ton ve kalibre kodlarını eşleştirin."],
     fields: [
       { key: "length", label: "Uygulama uzunluğu", unit: "m", value: 4, min: 0.1, step: 0.1 },
       { key: "width", label: "Uygulama genişliği", unit: "m", value: 3, min: 0.1, step: 0.1 },
-      { key: "tileWidth", label: "Seramik genişliği", unit: "cm", value: 60, min: 1, step: 1 },
-      { key: "tileHeight", label: "Seramik yüksekliği", unit: "cm", value: 60, min: 1, step: 1 },
-      { key: "piecesPerBox", label: "Kutudaki seramik adedi", unit: "adet", value: 4, min: 1, step: 1 },
       { key: "boxArea", label: "Kutunun kapladığı alan", unit: "m²", value: 1.44, min: 0, step: 0.01 },
-      { key: "waste", label: "Kesim ve fire payı", unit: "%", value: 10, min: 0, max: 50, step: 1 },
     ],
     calculate: calculateTile,
   },
@@ -88,7 +84,6 @@ const tools = {
       { key: "rollWidth", label: "Rulo genişliği", unit: "cm", value: 53, min: 1, step: 1 },
       { key: "rollLength", label: "Rulo uzunluğu", unit: "m", value: 10, min: 0.1, step: 0.1 },
       { key: "patternRepeat", label: "Desen tekrarı", unit: "cm", value: 0, min: 0, step: 1 },
-      { key: "trim", label: "Şerit başına kesim payı", unit: "cm", value: 10, min: 0, step: 1 },
     ],
     calculate: calculateWallpaper,
   },
@@ -102,7 +97,6 @@ const tools = {
       { key: "wallHeight", label: "Duvar yüksekliği", unit: "m", value: 2.7, min: 0.1, step: 0.1 },
       { key: "panelWidth", label: "Panel genişliği", unit: "cm", value: 60, min: 1, step: 1 },
       { key: "panelHeight", label: "Panel yüksekliği", unit: "cm", value: 280, min: 1, step: 1 },
-      { key: "waste", label: "Yedek ve fire payı", unit: "%", value: 5, min: 0, max: 50, step: 1 },
     ],
     calculate: calculateWallPanel,
   },
@@ -116,7 +110,6 @@ const tools = {
       { key: "width", label: "Genişlik", unit: "m", value: 3, min: 0.1, step: 0.1 },
       { key: "thickness", label: "Kalınlık", unit: "cm", value: 10, min: 1, step: 1 },
       { key: "bagYield", label: "Hazır karışım torbası verimi", unit: "L", value: 12, min: 1, step: 0.5 },
-      { key: "waste", label: "Fire payı", unit: "%", value: 8, min: 0, max: 50, step: 1 },
     ],
     calculate: calculateConcrete,
   },
@@ -124,15 +117,13 @@ const tools = {
     title: "Tuğla ve Blok Hesaplama",
     subtitle: "Duvar alanına göre gereken tuğla veya blok adedini bulun.",
     button: "Tuğlayı hesapla",
-    formGuidance: ["Ürünün duvar yüzünde görülen uzunluk ve yüksekliğini girin.", "Kapı ve pencerelerin toplam alanını çıkarın.", "İnce yapıştırıcılı gazbetonda derz kalınlığını ürün talimatına göre değiştirin."],
+    formGuidance: ["Ürünün duvar yüzünde görülen uzunluk ve yüksekliğini girin.", "Kapı ve pencerelerin toplam alanını çıkarın.", "Derz ve kırılma payını sistem otomatik uygular."],
     fields: [
       { key: "wallWidth", label: "Duvar genişliği", unit: "m", value: 5, min: 0.1, step: 0.1 },
       { key: "wallHeight", label: "Duvar yüksekliği", unit: "m", value: 2.7, min: 0.1, step: 0.1 },
       { key: "openingArea", label: "Kapı ve pencere alanı", unit: "m²", value: 2, min: 0, step: 0.1 },
       { key: "blockWidth", label: "Tuğla/blok uzunluğu", unit: "cm", value: 19, min: 1, step: 0.5 },
       { key: "blockHeight", label: "Tuğla/blok yüksekliği", unit: "cm", value: 13.5, min: 1, step: 0.5 },
-      { key: "joint", label: "Derz kalınlığı", unit: "mm", value: 10, min: 0, step: 1 },
-      { key: "waste", label: "Kırılma ve fire payı", unit: "%", value: 8, min: 0, max: 50, step: 1 },
     ],
     calculate: calculateBrick,
   },
@@ -140,13 +131,12 @@ const tools = {
     title: "Süpürgelik Hesaplama",
     subtitle: "Oda çevresine göre gereken süpürgelik boyunu hesaplayın.",
     button: "Süpürgeliği hesapla",
-    formGuidance: ["Süpürgelik uygulanmayacak kapı açıklıklarının toplamını girin.", "Ürün boyunu ambalaj veya ürün bilgisinden kontrol edin.", "Çok köşeli odalarda fire payını artırın."],
+    formGuidance: ["Süpürgelik uygulanmayacak kapı açıklıklarının toplamını girin.", "Ürün boyunu ambalaj veya ürün bilgisinden kontrol edin.", "Standart kesim payını sistem otomatik ekler."],
     fields: [
       { key: "length", label: "Oda uzunluğu", unit: "m", value: 5, min: 0.1, step: 0.1 },
       { key: "width", label: "Oda genişliği", unit: "m", value: 4, min: 0.1, step: 0.1 },
       { key: "doorWidth", label: "Toplam kapı genişliği", unit: "m", value: 0.9, min: 0, step: 0.1 },
       { key: "pieceLength", label: "Bir süpürgelik boyu", unit: "m", value: 2.4, min: 0.1, step: 0.1 },
-      { key: "waste", label: "Kesim ve fire payı", unit: "%", value: 10, min: 0, max: 50, step: 1 },
     ],
     calculate: calculateSkirting,
   },
@@ -171,7 +161,6 @@ const tools = {
         ],
       },
       { key: "panelCount", label: "Perde parçası", unit: "adet", value: 2, min: 1, step: 1 },
-      { key: "sideHem", label: "Her parçada toplam yan kıvırma", unit: "cm", value: 20, min: 0, step: 1 },
     ],
     calculate: calculateCurtain,
   },
@@ -200,7 +189,7 @@ const multiTools = {
   beton: { label: "Bölüm", addLabel: "Beton bölümü ekle", repeat: ["length", "width", "thickness"] },
   tugla: { label: "Duvar", addLabel: "Duvar ekle", repeat: ["wallWidth", "wallHeight", "openingArea"] },
   supurgelik: { label: "Oda", addLabel: "Oda ekle", repeat: ["length", "width", "doorWidth"] },
-  perde: { label: "Pencere", addLabel: "Pencere ekle", repeat: ["railWidth", "panelCount", "sideHem"] },
+  perde: { label: "Pencere", addLabel: "Pencere ekle", repeat: ["railWidth", "panelCount"] },
   elektrik: { label: "Cihaz", addLabel: "Cihaz ekle", repeat: ["watts", "count", "hoursPerDay", "daysPerMonth"] },
 };
 
@@ -433,14 +422,11 @@ export function calculateParquet(input) {
 }
 
 export function calculateTile(input) {
+  const waste = 10;
   const area = positive(input.length) * positive(input.width);
-  const requiredArea = withWaste(area, input.waste);
-  const tileArea = (positive(input.tileWidth) / 100) * (positive(input.tileHeight) / 100);
-  const pieces = Math.ceil(requiredArea / Math.max(0.0001, tileArea));
-  const piecesPerBox = Math.max(1, positive(input.piecesPerBox));
+  const requiredArea = withWaste(area, waste);
   const statedBoxArea = positive(input.boxArea);
-  const calculatedBoxArea = tileArea * piecesPerBox;
-  const boxArea = statedBoxArea > 0 ? statedBoxArea : calculatedBoxArea;
+  const boxArea = statedBoxArea > 0 ? statedBoxArea : 1.44;
   const boxes = Math.ceil(requiredArea / Math.max(0.0001, boxArea));
 
   return completedResult(
@@ -453,8 +439,8 @@ export function calculateTile(input) {
       ["Satın Alınan Toplam Alan", `${trNumber.format(rounded(boxes * boxArea))} m²`],
     ],
     statedBoxArea > 0
-      ? `Ambalaj üzerindeki kutu m² bilgisine göre ${trNumber.format(boxes)} kutu öneriyoruz. Kesim ve kırılma için %${trNumber.format(positive(input.waste))} pay eklendi; kutuların ton ve kalibre kodlarını eşleştirin.`
-      : `Kutu alanı girilmediği için ürün ölçüsü ve kutu içi adet kullanıldı. Satın almadan önce ambalajdaki toplam m² bilgisini doğrulayın.`,
+      ? `Ambalaj üzerindeki kutu m² bilgisine göre ${trNumber.format(boxes)} kutu öneriyoruz. Kesim ve kırılma için standart %${trNumber.format(waste)} pay sistem tarafından eklendi; kutuların ton ve kalibre kodlarını eşleştirin.`
+      : `Kutu alanı girilmediği için standart 1,44 m² paket kabul edildi. Satın almadan önce ambalajdaki toplam m² bilgisini doğrulayın.`,
     "Alan ve kutu ihtiyacınız aşağıda."
   );
 }
@@ -462,7 +448,7 @@ export function calculateTile(input) {
 export function calculateWallpaper(input) {
   const rollWidthM = positive(input.rollWidth) / 100;
   const repeatM = positive(input.patternRepeat) / 100;
-  const trimM = positive(input.trim) / 100;
+  const trimM = 0.1;
   const rawStrip = positive(input.wallHeight) + trimM;
   const stripLength = repeatM > 0 ? Math.ceil(rawStrip / repeatM) * repeatM : rawStrip;
   const stripsNeeded = Math.ceil(positive(input.totalWallWidth) / Math.max(0.01, rollWidthM));
@@ -495,10 +481,11 @@ export function calculateWallpaper(input) {
 }
 
 export function calculateWallPanel(input) {
+  const waste = 5;
   const columns = Math.ceil(positive(input.wallWidth) / Math.max(0.01, positive(input.panelWidth) / 100));
   const rows = Math.ceil(positive(input.wallHeight) / Math.max(0.01, positive(input.panelHeight) / 100));
   const basePieces = columns * rows;
-  const pieces = Math.ceil(withWaste(basePieces, input.waste));
+  const pieces = Math.ceil(withWaste(basePieces, waste));
   const wallArea = positive(input.wallWidth) * positive(input.wallHeight);
 
   return completedResult(
@@ -509,14 +496,15 @@ export function calculateWallPanel(input) {
       ["Dikeyde Gereken Sıra", `${trNumber.format(rows)} sıra`],
       ["Fire Dahil Önerilen Panel", `${trNumber.format(pieces)} adet`],
     ],
-    `Panellerin dikey yerleşimine ve %${trNumber.format(positive(input.waste))} yedek payına göre ${trNumber.format(pieces)} adet panel öneriyoruz. Geçme payları, prizler ve köşe kesimleri için ürünün gerçek kaplama ölçüsünü doğrulayın.`,
+    `Panellerin dikey yerleşimine ve sistemin eklediği standart %${trNumber.format(waste)} yedek payına göre ${trNumber.format(pieces)} adet panel öneriyoruz. Geçme payları, prizler ve köşe kesimleri için ürünün gerçek kaplama ölçüsünü doğrulayın.`,
     "Duvar ve panel ihtiyacınız aşağıda."
   );
 }
 
 export function calculateConcrete(input) {
+  const waste = 8;
   const netVolume = positive(input.length) * positive(input.width) * (positive(input.thickness) / 100);
-  const orderVolume = withWaste(netVolume, input.waste);
+  const orderVolume = withWaste(netVolume, waste);
   const bags = Math.ceil((orderVolume * 1000) / Math.max(0.1, positive(input.bagYield)));
 
   return completedResult(
@@ -527,18 +515,19 @@ export function calculateConcrete(input) {
       ["Litre Karşılığı", `${trNumber.format(Math.ceil(orderVolume * 1000))} L`],
       ["Hazır Karışım Torbası", `${trNumber.format(bags)} adet`],
     ],
-    `Ölçülerinize %${trNumber.format(positive(input.waste))} pay ekleyerek yaklaşık ${trNumber.format(rounded(orderVolume, 2))} m³ beton hesapladık. Torba hesabı girdiğiniz ürün verimine dayanır; taşıyıcı uygulamalarda beton sınıfı, donatı ve miktar için mutlaka uzman görüşü alın.`,
+    `Ölçülerinize sistem tarafından standart %${trNumber.format(waste)} uygulama payı eklenerek yaklaşık ${trNumber.format(rounded(orderVolume, 2))} m³ beton hesaplandı. Torba hesabı girdiğiniz ürün verimine dayanır; taşıyıcı uygulamalarda beton sınıfı, donatı ve miktar için mutlaka uzman görüşü alın.`,
     "Hacim ve yaklaşık malzeme ihtiyacınız aşağıda."
   );
 }
 
 export function calculateBrick(input) {
+  const waste = 8;
   const grossArea = positive(input.wallWidth) * positive(input.wallHeight);
   const netArea = Math.max(0, grossArea - positive(input.openingArea));
-  const jointM = positive(input.joint) / 1000;
+  const jointM = 0.01;
   const moduleArea = (positive(input.blockWidth) / 100 + jointM) * (positive(input.blockHeight) / 100 + jointM);
   const basePieces = netArea / Math.max(0.0001, moduleArea);
-  const pieces = Math.ceil(withWaste(basePieces, input.waste));
+  const pieces = Math.ceil(withWaste(basePieces, waste));
 
   return completedResult(
     `${trNumber.format(pieces)} adet tuğla/blok`,
@@ -548,15 +537,16 @@ export function calculateBrick(input) {
       ["Metrekare Başına Ürün", `${trNumber.format(rounded(1 / Math.max(0.0001, moduleArea), 1))} adet`],
       ["Fire Dahil Önerilen Adet", `${trNumber.format(pieces)} adet`],
     ],
-    `Kapı ve pencere alanları çıkarılıp derz ile %${trNumber.format(positive(input.waste))} kırılma payı eklendi. Yaklaşık ${trNumber.format(pieces)} adet ürün gerekir; ürün ölçüsü ve derz uygulamasını üretici tavsiyesine göre doğrulayın.`,
+    `Kapı ve pencere alanları çıkarıldı; standart 10 mm derz ve %${trNumber.format(waste)} kırılma payı sistem tarafından uygulandı. Yaklaşık ${trNumber.format(pieces)} adet ürün gerekir; özel uygulamalarda ürün ölçüsü ve derzi üretici tavsiyesine göre doğrulayın.`,
     "Duvar alanı ve ürün ihtiyacınız aşağıda."
   );
 }
 
 export function calculateSkirting(input) {
+  const waste = 10;
   const perimeter = 2 * (positive(input.length) + positive(input.width));
   const netLength = Math.max(0, perimeter - positive(input.doorWidth));
-  const requiredLength = withWaste(netLength, input.waste);
+  const requiredLength = withWaste(netLength, waste);
   const pieces = Math.ceil(requiredLength / Math.max(0.01, positive(input.pieceLength)));
 
   return completedResult(
@@ -568,14 +558,15 @@ export function calculateSkirting(input) {
       ["Önerilen Ürün Boyu", `${trNumber.format(pieces)} boy`],
       ["Satın Alınan Toplam Uzunluk", `${trNumber.format(rounded(pieces * positive(input.pieceLength)))} m`],
     ],
-    `Kapı açıklıkları çıkarılıp %${trNumber.format(positive(input.waste))} kesim payı eklendi. ${trNumber.format(pieces)} boy süpürgelik öneriyoruz; köşe sayısı arttıkça kesim firesi de artabilir.`,
+    `Kapı açıklıkları çıkarılıp sistem tarafından standart %${trNumber.format(waste)} kesim payı eklendi. ${trNumber.format(pieces)} boy süpürgelik öneriyoruz; köşe sayısı arttıkça kesim kaybı da artabilir.`,
     "Çevre ve süpürgelik ihtiyacınız aşağıda."
   );
 }
 
 export function calculateCurtain(input) {
+  const sideHem = 20;
   const finishedWidth = positive(input.railWidth) * positive(input.fullness);
-  const hemAllowance = (positive(input.sideHem) / 100) * Math.max(1, positive(input.panelCount));
+  const hemAllowance = (sideHem / 100) * Math.max(1, positive(input.panelCount));
   const fabricMeters = finishedWidth + hemAllowance;
 
   return completedResult(
