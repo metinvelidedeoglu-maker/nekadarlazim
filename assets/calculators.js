@@ -43,12 +43,21 @@ const tools = {
     title: "Parke Hesaplama",
     subtitle: "Odanız için gereken parke alanını ve paket sayısını bulun.",
     button: "Parkeyi hesapla",
-    formGuidance: ["Paketin kapladığı m² bilgisini ürün ambalajından alın.", "Çapraz veya çok köşeli döşemede fire payını artırın."],
+    formGuidance: ["Paketin kapladığı m² bilgisini ürün ambalajından alın.", "Parkenin düz mü, çapraz mı döşeneceğini seçin; uygun kesim payını sistem ekler."],
     fields: [
       { key: "length", label: "Oda uzunluğu", unit: "m", value: 5, min: 0.1, step: 0.1 },
       { key: "width", label: "Oda genişliği", unit: "m", value: 4, min: 0.1, step: 0.1 },
       { key: "packArea", label: "Bir paketin kapladığı alan", unit: "m²", value: 1.84, min: 0.1, step: 0.01 },
-      { key: "waste", label: "Kesim ve fire payı", unit: "%", value: 10, min: 0, max: 50, step: 1 },
+      {
+        key: "layoutWaste",
+        label: "Döşeme biçimi",
+        type: "select",
+        value: 10,
+        options: [
+          { value: 10, label: "Düz döşeme" },
+          { value: 15, label: "Çapraz döşeme" },
+        ],
+      },
     ],
     calculate: calculateParquet,
   },
@@ -378,18 +387,21 @@ export function recommendPaintCoats(currentCondition, desiredCondition) {
 
 export function calculateParquet(input) {
   const area = positive(input.length) * positive(input.width);
-  const requiredArea = withWaste(area, input.waste);
+  const waste = positive(input.layoutWaste) === 15 ? 15 : 10;
+  const layoutLabel = waste === 15 ? "Çapraz döşeme" : "Düz döşeme";
+  const requiredArea = withWaste(area, waste);
   const packs = Math.ceil(requiredArea / Math.max(0.01, positive(input.packArea)));
 
   return completedResult(
     `${trNumber.format(packs)} paket parke`,
     [
       ["Net Zemin Alanı", `${trNumber.format(rounded(area))} m²`],
+      ["Seçilen Döşeme Biçimi", layoutLabel],
       ["Fire Dahil Parke İhtiyacı", `${trNumber.format(rounded(requiredArea))} m²`],
       ["Önerilen Paket Sayısı", `${trNumber.format(packs)} paket`],
       ["Paketlerin Toplam Alanı", `${trNumber.format(rounded(packs * positive(input.packArea)))} m²`],
     ],
-    `Girdiğiniz ölçülere ve %${trNumber.format(positive(input.waste))} fire payına göre ${trNumber.format(packs)} paket parke gerekir. Paket alanını satın alacağınız ürünün ambalajından doğrulayın; çapraz veya çok köşeli döşemede fireyi artırın.`,
+    `${layoutLabel} seçiminize uygun %${trNumber.format(waste)} kesim payı sistem tarafından eklendi ve ${trNumber.format(packs)} paket parke hesaplandı. Paket alanını satın alacağınız ürünün ambalajından doğrulayın; oda çok köşeliyse uygulayıcınıza danışın.`,
     "Zemin ve paket ihtiyacınız aşağıda."
   );
 }
