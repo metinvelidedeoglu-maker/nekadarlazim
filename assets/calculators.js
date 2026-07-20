@@ -15,7 +15,20 @@ const tools = {
       { key: "height", label: "Duvar yüksekliği", unit: "m", value: 2.7, min: 0.1, step: 0.1 },
       { key: "doorArea", label: "Toplam kapı alanı", unit: "m²", value: 2, min: 0, step: 0.1 },
       { key: "windowArea", label: "Toplam pencere alanı", unit: "m²", value: 3, min: 0, step: 0.1 },
-      { key: "coats", label: "Kat sayısı", unit: "kat", value: 2, min: 1, step: 1 },
+      {
+        key: "currentCondition",
+        label: "Mevcut durumu tarif edin",
+        type: "textarea",
+        value: "",
+        placeholder: "Örn. Duvarlar koyu lacivert, yüzey düzgün ve temiz.",
+      },
+      {
+        key: "desiredCondition",
+        label: "İstenen durumu tarif edin",
+        type: "textarea",
+        value: "",
+        placeholder: "Örn. Açık kırık beyaz renge boyamak istiyorum.",
+      },
     ],
     calculate: calculatePaint,
   },
@@ -203,7 +216,8 @@ function estimatedCost(total, unitPrice) {
 export function calculatePaint(input) {
   const coverage = 10;
   const waste = 10;
-  const coats = Math.max(1, positive(input.coats));
+  const recommendation = recommendPaintCoats(input.currentCondition, input.desiredCondition);
+  const coats = recommendation.coats;
   const grossArea = 2 * (positive(input.length) + positive(input.width)) * positive(input.height);
   const netArea = Math.max(0, grossArea - positive(input.doorArea) - positive(input.windowArea));
   const ceilingArea = positive(input.length) * positive(input.width);
@@ -219,12 +233,56 @@ export function calculatePaint(input) {
     [
       ["Boyanacak net duvar", `${trNumber.format(rounded(netArea))} m²`],
       ["Tavan alanı", `${trNumber.format(rounded(ceilingArea))} m²`],
+      ["Önerilen kat sayısı", `${coats} kat`],
+      ["Önerinin nedeni", recommendation.reason],
       ["Duvar için gereken", `${trNumber.format(rounded(wallLiters, 1))} L`],
       ["Tavan için gereken", `${trNumber.format(rounded(ceilingLiters, 1))} L`],
       ["Toplam boya ihtiyacı", `${trNumber.format(rounded(totalLiters, 1))} L`],
     ],
-    "Yüzey emiciliği ve boya türü gerçek tüketimi etkileyebilir. Duvar ve tavan boyaları ayrı ürünlerse miktarları ayrı değerlendirin."
+    `${recommendation.primerNote} Yüzey emiciliği ve boya türü gerçek tüketimi etkileyebilir. Duvar ve tavan boyaları ayrı ürünlerse miktarları ayrı değerlendirin.`
   );
+}
+
+function normalizedDescription(value) {
+  return String(value ?? "")
+    .toLocaleLowerCase("tr-TR")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replaceAll("ı", "i");
+}
+
+export function recommendPaintCoats(currentCondition, desiredCondition) {
+  const current = normalizedDescription(currentCondition);
+  const desired = normalizedDescription(desiredCondition);
+  const combined = `${current} ${desired}`;
+  const mentions = (text, words) => words.some((word) => text.includes(word));
+
+  const currentIsDark = mentions(current, ["koyu", "siyah", "lacivert", "bordo", "kirmizi", "kahverengi", "antrasit"]);
+  const desiredIsLight = mentions(desired, ["acik", "beyaz", "krem", "bej", "fildisi", "kirik beyaz"]);
+  const difficultSurface = mentions(combined, ["lekeli", "leke", "rutubet", "nem", "is", "nikotin", "yamali", "yama", "catlak"]);
+  const rawSurface = mentions(combined, ["yeni siva", "ham siva", "alci", "alcili", "ham yuzey", "ciplak yuzey", "cok emici"]);
+
+  if ((currentIsDark && desiredIsLight) || difficultSurface) {
+    return {
+      coats: 3,
+      reason: currentIsDark && desiredIsLight ? "Koyu renkten açık renge geçiş tarif edildi." : "Lekeli veya düzensiz bir yüzey tarif edildi.",
+      primerNote: difficultSurface || rawSurface ? "Boyadan önce yüzeye uygun astar uygulanması önerilir." : "Gerekirse ilk kat öncesinde uygun astar kullanın.",
+    };
+  }
+
+  if (rawSurface) {
+    return {
+      coats: 2,
+      reason: "Yeni veya emici yüzey için astar sonrası iki kat boya önerildi.",
+      primerNote: "Boyadan önce yüzeye uygun astar uygulanması önerilir.",
+    };
+  }
+
+  return {
+    coats: 2,
+    reason: current || desired ? "Tarif edilen standart yenileme için iki kat önerildi." : "Yüzey tarifi girilmediği için standart iki kat esas alındı.",
+    primerNote: "Astar gereksinimini uygulama öncesinde yüzey üzerinde kontrol edin.",
+  };
 }
 
 export function calculateParquet(input) {
@@ -452,6 +510,10 @@ function renderField(field) {
     return `<label class="field" for="${id}"><span>${escapeHtml(field.label)}</span><select id="${id}" name="${escapeHtml(field.key)}">${options}</select></label>`;
   }
 
+  if (field.type === "textarea") {
+    return `<label class="field description-field" for="${id}"><span>${escapeHtml(field.label)}</span><textarea id="${id}" name="${escapeHtml(field.key)}" rows="3" maxlength="500" placeholder="${escapeHtml(field.placeholder || "")}" autocomplete="off">${escapeHtml(field.value || "")}</textarea></label>`;
+  }
+
   const displayValue = String(field.value).replace(".", ",");
   return `<label class="field" for="${id}">
     <span>${escapeHtml(field.label)}</span>
@@ -488,6 +550,10 @@ function readValues(tool, form) {
 
   tool.fields.forEach((field) => {
     const input = form.elements.namedItem(field.key);
+    if (field.type === "textarea") {
+      values[field.key] = input?.value.trim() || "";
+      return;
+    }
     const value = parseLocaleNumber(input?.value);
     let error = "";
 
