@@ -9,6 +9,7 @@ const tools = {
     title: "Duvar Boyası Hesaplama",
     subtitle: "Odanızın duvarları ve tavanı için gereken yaklaşık boya miktarını hesaplayın.",
     button: "Boyayı hesapla",
+    showInterpretation: true,
     formGuidance: [
       "Mevcut rengi, lekeleri, çatlakları ve yüzeyin yeni sıva ya da alçı olup olmadığını yazın.",
       "İstenen yeni rengi özellikle açık veya koyu olarak tarif edin.",
@@ -245,7 +246,7 @@ export function calculatePaint(input) {
   const ceilingStatus = ceilingCoats > 0 ? `${ceilingCoats} kat` : "Boyanmayacak";
   const ceilingAmount = ceilingCoats > 0 ? `${trNumber.format(rounded(ceilingLiters, 1))} L` : "0 L";
 
-  return result(
+  const output = result(
     `${trNumber.format(rounded(totalLiters, 1))} litre toplam boya`,
     ceilingCoats > 0 ? "Duvar ve tavan için yaklaşık ihtiyaç" : "Duvar için yaklaşık ihtiyaç",
     [
@@ -261,6 +262,8 @@ export function calculatePaint(input) {
     ],
     `${recommendation.warning} ${recommendation.primerNote} İstediğiniz renk tonunu mağazada markanın kartelasından seçip hazırlatabilirsiniz. Ambalaj seçeneklerine göre miktarı yukarı tamamlayın.`.trim()
   );
+  output.interpretation = recommendation.interpretation;
+  return output;
 }
 
 function normalizedDescription(value) {
@@ -298,6 +301,7 @@ export function recommendPaintCoats(currentCondition, desiredCondition) {
       primerNote: "Astar tek başına rutubet sorununu çözmez.",
       moistureProblem: true,
       warning: "Yüzeydeki nem veya su kaynağını giderip gevşek katmanları temizlemeden boyaya başlamayın.",
+      interpretation: "Yüzeyde aktif nem, rutubet veya kabarma olabileceğini anladık; önce sorunun kaynağı giderilmeli.",
     };
   }
 
@@ -311,6 +315,7 @@ export function recommendPaintCoats(currentCondition, desiredCondition) {
       primerNote: "Ürünü lekenin türüne uygun seçin.",
       moistureProblem: false,
       warning: "",
+      interpretation: `Yüzeyin lekeli, isli veya nikotinli olduğunu anladık${colorTransition ? "; ayrıca koyu renkten açık renge geçilecek" : ""}.`,
     };
   }
 
@@ -324,6 +329,7 @@ export function recommendPaintCoats(currentCondition, desiredCondition) {
       primerNote: "Boyadan önce yüzeye uygun tek kat astar uygulayın.",
       moistureProblem: false,
       warning: "",
+      interpretation: "Yüzeyin yeni sıva, alçı veya çok emici olduğunu anladık; astar sonrası 2 kat boya uygun görünüyor.",
     };
   }
 
@@ -337,6 +343,9 @@ export function recommendPaintCoats(currentCondition, desiredCondition) {
       primerNote: "Astar, son kat rengin daha dengeli görünmesine yardımcı olabilir.",
       moistureProblem: false,
       warning: "",
+      interpretation: colorTransition
+        ? "Mevcut rengin koyu, istenen rengin açık olduğunu anladık; geçiş astarı ve 3 kat boya öneriyoruz."
+        : "Yüzeyin yamalı, çatlaklı veya farklı emicilikte olduğunu anladık; yüzey astarı öneriyoruz.",
     };
   }
 
@@ -349,6 +358,9 @@ export function recommendPaintCoats(currentCondition, desiredCondition) {
     primerNote: "Yüzeyin sağlam, temiz ve kuru olduğunu uygulama öncesinde kontrol edin.",
     moistureProblem: false,
     warning: "",
+    interpretation: current || desired
+      ? "Belirgin bir yüzey sorunu veya zorlu renk geçişi algılamadık; standart 2 kat boya hesaplıyoruz."
+      : "Henüz yüzey tarifi girilmedi; standart, sağlam ve kuru bir yüzey kabul ediyoruz.",
   };
 }
 
@@ -669,6 +681,7 @@ function initCalculator(root) {
       <div class="form-grid">
         <label class="field project-field" for="field-project-name"><span>Alan / proje adı <small>(isteğe bağlı)</small></span><span class="input-wrap"><input id="field-project-name" name="projectName" type="text" maxlength="100" placeholder="Örn. Salon" autocomplete="off"></span></label>
         ${tool.fields.map(renderField).join("")}
+        ${tool.showInterpretation ? `<p class="interpretation-preview" aria-live="polite"></p>` : ""}
         ${tool.formGuidance ? `<div class="form-guidance"><strong>Doğru sonuç için</strong><ul>${tool.formGuidance.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></div>` : ""}
       </div>
       <button class="primary-button calculate-button" type="submit">${escapeHtml(tool.button)}</button>
@@ -695,6 +708,8 @@ function initCalculator(root) {
 
     message.hidden = true;
     const calculation = tool.calculate(values);
+    const interpretation = form.querySelector(".interpretation-preview");
+    if (interpretation) interpretation.textContent = `Yazdığınızdan anladığımız: ${calculation.interpretation}`;
     resultRoot.innerHTML = renderResult(calculation);
     const projectName = form.elements.namedItem("projectName").value.trim();
     const text = calculationText(tool, calculation, projectName);
