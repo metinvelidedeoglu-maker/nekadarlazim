@@ -9,6 +9,11 @@ const tools = {
     title: "Duvar Boyası Hesaplama",
     subtitle: "Odanızın duvarları ve tavanı için gereken yaklaşık boya miktarını hesaplayın.",
     button: "Boyayı hesapla",
+    formGuidance: [
+      "Mevcut rengi, lekeleri, çatlakları ve yüzeyin yeni sıva ya da alçı olup olmadığını yazın.",
+      "İstenen yeni rengi özellikle açık veya koyu olarak tarif edin.",
+      "Rutubet, nem veya kabarma varsa açıklamada mutlaka belirtin.",
+    ],
     fields: [
       { key: "length", label: "Oda uzunluğu", unit: "m", value: 5, min: 0.1, step: 0.1 },
       { key: "width", label: "Oda genişliği", unit: "m", value: 4, min: 0.1, step: 0.1 },
@@ -577,7 +582,7 @@ function renderField(field) {
   }
 
   if (field.type === "checkbox") {
-    return `<label class="field checkbox-field" for="${id}"><input id="${id}" name="${escapeHtml(field.key)}" type="checkbox" ${field.value ? "checked" : ""}><span>${escapeHtml(field.label)}</span></label>`;
+    return `<label class="field checkbox-field" for="${id}"><span>${escapeHtml(field.label)}</span><input id="${id}" name="${escapeHtml(field.key)}" type="checkbox" ${field.value ? "checked" : ""}></label>`;
   }
 
   const displayValue = String(field.value).replace(".", ",");
@@ -664,6 +669,7 @@ function initCalculator(root) {
       <div class="form-grid">
         <label class="field project-field" for="field-project-name"><span>Alan / proje adı <small>(isteğe bağlı)</small></span><span class="input-wrap"><input id="field-project-name" name="projectName" type="text" maxlength="100" placeholder="Örn. Salon" autocomplete="off"></span></label>
         ${tool.fields.map(renderField).join("")}
+        ${tool.formGuidance ? `<div class="form-guidance"><strong>Doğru sonuç için</strong><ul>${tool.formGuidance.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></div>` : ""}
       </div>
       <button class="primary-button calculate-button" type="submit">${escapeHtml(tool.button)}</button>
       <p class="live-hint">Değerleri değiştirdikçe sonuç otomatik yenilenir.</p>
