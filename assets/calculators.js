@@ -15,6 +15,7 @@ const tools = {
       { key: "height", label: "Duvar yüksekliği", unit: "m", value: 2.7, min: 0.1, step: 0.1 },
       { key: "doorArea", label: "Toplam kapı alanı", unit: "m²", value: 2, min: 0, step: 0.1 },
       { key: "windowArea", label: "Toplam pencere alanı", unit: "m²", value: 3, min: 0, step: 0.1 },
+      { key: "paintCeiling", label: "Tavan da boyanacak", type: "checkbox", value: true },
       {
         key: "currentCondition",
         label: "Mevcut durumu tarif edin",
@@ -216,30 +217,44 @@ function estimatedCost(total, unitPrice) {
 export function calculatePaint(input) {
   const coverage = 10;
   const waste = 10;
+  const primerCoverage = 10;
   const recommendation = recommendPaintCoats(input.currentCondition, input.desiredCondition);
-  const coats = recommendation.coats;
+  const wallCoats = recommendation.coats;
+  const ceilingCoats = input.paintCeiling === false ? 0 : 2;
   const grossArea = 2 * (positive(input.length) + positive(input.width)) * positive(input.height);
   const netArea = Math.max(0, grossArea - positive(input.doorArea) - positive(input.windowArea));
   const ceilingArea = positive(input.length) * positive(input.width);
-  const coatedWallArea = netArea * coats;
-  const coatedCeilingArea = ceilingArea * coats;
+  const coatedWallArea = netArea * wallCoats;
+  const coatedCeilingArea = ceilingArea * ceilingCoats;
   const wallLiters = withWaste(coatedWallArea / coverage, waste);
   const ceilingLiters = withWaste(coatedCeilingArea / coverage, waste);
   const totalLiters = wallLiters + ceilingLiters;
+  const primerLiters = recommendation.primerRequired || recommendation.primerRecommended
+    ? withWaste(netArea / primerCoverage, waste)
+    : 0;
+  const primerAmount = recommendation.moistureProblem
+    ? "Sorun giderilmeden hesaplanmadı"
+    : primerLiters > 0
+      ? `${trNumber.format(rounded(primerLiters, 1))} L`
+      : "Gerekli görünmüyor";
+  const ceilingStatus = ceilingCoats > 0 ? `${ceilingCoats} kat` : "Boyanmayacak";
+  const ceilingAmount = ceilingCoats > 0 ? `${trNumber.format(rounded(ceilingLiters, 1))} L` : "0 L";
 
   return result(
     `${trNumber.format(rounded(totalLiters, 1))} litre toplam boya`,
-    "Duvar ve tavan için yaklaşık ihtiyaç",
+    ceilingCoats > 0 ? "Duvar ve tavan için yaklaşık ihtiyaç" : "Duvar için yaklaşık ihtiyaç",
     [
       ["Boyanacak net duvar", `${trNumber.format(rounded(netArea))} m²`],
-      ["Tavan alanı", `${trNumber.format(rounded(ceilingArea))} m²`],
-      ["Önerilen kat sayısı", `${coats} kat`],
+      ["Duvar kat sayısı", `${wallCoats} kat`],
       ["Önerinin nedeni", recommendation.reason],
       ["Duvar için gereken", `${trNumber.format(rounded(wallLiters, 1))} L`],
-      ["Tavan için gereken", `${trNumber.format(rounded(ceilingLiters, 1))} L`],
+      ["Tavan uygulaması", ceilingStatus],
+      ["Tavan için gereken", ceilingAmount],
+      ["Astar önerisi", recommendation.primerLabel],
+      ["Duvar astarı", primerAmount],
       ["Toplam boya ihtiyacı", `${trNumber.format(rounded(totalLiters, 1))} L`],
     ],
-    `${recommendation.primerNote} Yüzey emiciliği ve boya türü gerçek tüketimi etkileyebilir. Duvar ve tavan boyaları ayrı ürünlerse miktarları ayrı değerlendirin.`
+    `${recommendation.warning} ${recommendation.primerNote} İstediğiniz renk tonunu mağazada markanın kartelasından seçip hazırlatabilirsiniz. Ambalaj seçeneklerine göre miktarı yukarı tamamlayın.`.trim()
   );
 }
 
@@ -248,25 +263,49 @@ function normalizedDescription(value) {
     .toLocaleLowerCase("tr-TR")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replaceAll("ı", "i");
+    .replaceAll("ı", "i")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
 }
 
 export function recommendPaintCoats(currentCondition, desiredCondition) {
   const current = normalizedDescription(currentCondition);
   const desired = normalizedDescription(desiredCondition);
   const combined = `${current} ${desired}`;
-  const mentions = (text, words) => words.some((word) => text.includes(word));
+  const mentions = (text, words) => words.some((word) => ` ${text} `.includes(` ${word} `));
 
   const currentIsDark = mentions(current, ["koyu", "siyah", "lacivert", "bordo", "kirmizi", "kahverengi", "antrasit"]);
   const desiredIsLight = mentions(desired, ["acik", "beyaz", "krem", "bej", "fildisi", "kirik beyaz"]);
-  const difficultSurface = mentions(combined, ["lekeli", "leke", "rutubet", "nem", "is", "nikotin", "yamali", "yama", "catlak"]);
-  const rawSurface = mentions(combined, ["yeni siva", "ham siva", "alci", "alcili", "ham yuzey", "ciplak yuzey", "cok emici"]);
+  const stainedSurface = mentions(combined, ["lekeli", "leke", "nikotin", "isli", "is", "yagli", "yag lekesi"]);
+  const unevenSurface = mentions(combined, ["yamali", "yama", "macunlu", "farkli emicilik", "catlak", "catlakli"]);
+  const rawSurface = mentions(combined, ["yeni siva", "ham siva", "yeni alci", "ham alci", "alcili", "ham yuzey", "ciplak yuzey", "cok emici", "yeni beton"]);
+  const moistureProblem = mentions(combined, ["rutubet", "rutubetli", "nem", "nemli", "islak", "su aliyor", "kabarma", "kabarmis", "dokulme", "dokuluyor"]);
+  const colorTransition = currentIsDark && desiredIsLight;
 
-  if ((currentIsDark && desiredIsLight) || difficultSurface) {
+  if (moistureProblem) {
+    return {
+      coats: 2,
+      reason: "Aktif nem, rutubet veya kabarma olasılığı tarif edildi.",
+      primerRequired: false,
+      primerRecommended: false,
+      primerLabel: "Şimdilik belirlenemez",
+      primerNote: "Astar tek başına rutubet sorununu çözmez.",
+      moistureProblem: true,
+      warning: "Yüzeydeki nem veya su kaynağını giderip gevşek katmanları temizlemeden boyaya başlamayın.",
+    };
+  }
+
+  if (stainedSurface) {
     return {
       coats: 3,
-      reason: currentIsDark && desiredIsLight ? "Koyu renkten açık renge geçiş tarif edildi." : "Lekeli veya düzensiz bir yüzey tarif edildi.",
-      primerNote: difficultSurface || rawSurface ? "Boyadan önce yüzeye uygun astar uygulanması önerilir." : "Gerekirse ilk kat öncesinde uygun astar kullanın.",
+      reason: "Lekeli, isli veya nikotinli bir yüzey tarif edildi.",
+      primerRequired: true,
+      primerRecommended: false,
+      primerLabel: "Leke önleyici astar gerekli",
+      primerNote: "Ürünü lekenin türüne uygun seçin.",
+      moistureProblem: false,
+      warning: "",
     };
   }
 
@@ -274,14 +313,37 @@ export function recommendPaintCoats(currentCondition, desiredCondition) {
     return {
       coats: 2,
       reason: "Yeni veya emici yüzey için astar sonrası iki kat boya önerildi.",
-      primerNote: "Boyadan önce yüzeye uygun astar uygulanması önerilir.",
+      primerRequired: true,
+      primerRecommended: false,
+      primerLabel: "Emicilik düzenleyici astar gerekli",
+      primerNote: "Boyadan önce yüzeye uygun tek kat astar uygulayın.",
+      moistureProblem: false,
+      warning: "",
+    };
+  }
+
+  if (colorTransition || unevenSurface) {
+    return {
+      coats: colorTransition ? 3 : 2,
+      reason: colorTransition ? "Koyu renkten açık renge geçiş tarif edildi." : "Yamalı veya farklı emicilikte bir yüzey tarif edildi.",
+      primerRequired: false,
+      primerRecommended: true,
+      primerLabel: colorTransition ? "Geçiş astarı önerilir" : "Yüzey astarı önerilir",
+      primerNote: "Astar, son kat rengin daha dengeli görünmesine yardımcı olabilir.",
+      moistureProblem: false,
+      warning: "",
     };
   }
 
   return {
     coats: 2,
     reason: current || desired ? "Tarif edilen standart yenileme için iki kat önerildi." : "Yüzey tarifi girilmediği için standart iki kat esas alındı.",
-    primerNote: "Astar gereksinimini uygulama öncesinde yüzey üzerinde kontrol edin.",
+    primerRequired: false,
+    primerRecommended: false,
+    primerLabel: "Gerekli görünmüyor",
+    primerNote: "Yüzeyin sağlam, temiz ve kuru olduğunu uygulama öncesinde kontrol edin.",
+    moistureProblem: false,
+    warning: "",
   };
 }
 
@@ -514,6 +576,10 @@ function renderField(field) {
     return `<label class="field description-field" for="${id}"><span>${escapeHtml(field.label)}</span><textarea id="${id}" name="${escapeHtml(field.key)}" rows="3" maxlength="500" placeholder="${escapeHtml(field.placeholder || "")}" autocomplete="off">${escapeHtml(field.value || "")}</textarea></label>`;
   }
 
+  if (field.type === "checkbox") {
+    return `<label class="field checkbox-field" for="${id}"><input id="${id}" name="${escapeHtml(field.key)}" type="checkbox" ${field.value ? "checked" : ""}><span>${escapeHtml(field.label)}</span></label>`;
+  }
+
   const displayValue = String(field.value).replace(".", ",");
   return `<label class="field" for="${id}">
     <span>${escapeHtml(field.label)}</span>
@@ -550,6 +616,10 @@ function readValues(tool, form) {
 
   tool.fields.forEach((field) => {
     const input = form.elements.namedItem(field.key);
+    if (field.type === "checkbox") {
+      values[field.key] = Boolean(input?.checked);
+      return;
+    }
     if (field.type === "textarea") {
       values[field.key] = input?.value.trim() || "";
       return;
