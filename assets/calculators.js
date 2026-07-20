@@ -264,6 +264,7 @@ export function calculatePaint(input) {
       ["Duvar İçin Astar Önerisi", recommendation.primerLabel],
       ["Duvar İçin Önerilen Astar Miktarı", primerAmount],
       ["Net Tavan Alanı", `${trNumber.format(rounded(ceilingArea))} m²`],
+      ["Tavan Boyası Kaç Kat Uygulanmalı", ceilingStatus],
       ["Tavan İçin Önerilen Boya Miktarı", ceilingAmount],
     ],
     `${recommendation.warning} ${recommendation.reason} Duvar için ${wallCoats} kat ve yaklaşık ${trNumber.format(rounded(wallLiters, 1))} litre boya hesapladık. ${primerAdvice} ${ceilingAdvice} İstediğiniz renk tonunu mağazada markanın kartelasından seçip hazırlatabilir, ürünün ambalaj seçeneklerine göre miktarı yukarı tamamlayabilirsiniz.`.trim()
