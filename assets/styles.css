@@ -729,6 +729,16 @@ body:not(.ads-enabled) .ad-slot {
   font-size: 0.8rem;
 }
 
+.interpretation-preview {
+  grid-column: 1 / -1;
+  margin: -0.15rem 0 0;
+  color: #7b8993;
+  font-size: 0.78rem;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
 .form-guidance strong {
   color: var(--ink);
 }
