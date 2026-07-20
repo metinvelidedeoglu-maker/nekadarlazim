@@ -851,9 +851,24 @@ body:not(.ads-enabled) .ad-slot {
 }
 
 .result-note {
-  margin: 1rem 0 0;
+  margin: 0.35rem 0 0;
   color: rgba(255, 255, 255, 0.82);
   font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.result-advice {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+}
+
+.result-advice > strong {
+  display: block;
+  color: white;
+  font-size: 0.95rem;
 }
 
 .result-actions {
