@@ -696,6 +696,26 @@ body:not(.ads-enabled) .ad-slot {
   grid-column: 1 / -1;
 }
 
+.checkbox-field {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 48px;
+  padding: 0.7rem 0.85rem;
+  background: var(--brand-soft);
+  border: 1px solid rgba(13, 124, 102, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.checkbox-field input {
+  width: 20px;
+  min-height: 20px;
+  padding: 0;
+  accent-color: var(--brand);
+}
+
 .field select {
   padding-right: 0.8rem;
 }
