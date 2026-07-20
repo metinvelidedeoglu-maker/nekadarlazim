@@ -43,12 +43,12 @@ const tools = {
     title: "Parke Hesaplama",
     subtitle: "Odanız için gereken parke alanını ve paket sayısını bulun.",
     button: "Parkeyi hesapla",
+    formGuidance: ["Paketin kapladığı m² bilgisini ürün ambalajından alın.", "Çapraz veya çok köşeli döşemede fire payını artırın."],
     fields: [
       { key: "length", label: "Oda uzunluğu", unit: "m", value: 5, min: 0.1, step: 0.1 },
       { key: "width", label: "Oda genişliği", unit: "m", value: 4, min: 0.1, step: 0.1 },
       { key: "packArea", label: "Bir paketin kapladığı alan", unit: "m²", value: 1.84, min: 0.1, step: 0.01 },
       { key: "waste", label: "Kesim ve fire payı", unit: "%", value: 10, min: 0, max: 50, step: 1 },
-      { key: "packPrice", label: "Paket fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
     ],
     calculate: calculateParquet,
   },
@@ -56,6 +56,7 @@ const tools = {
     title: "Seramik Hesaplama",
     subtitle: "Zemin veya duvar için gereken seramik adedini hesaplayın.",
     button: "Seramiği hesapla",
+    formGuidance: ["Kutu üzerindeki toplam m² bilgisini esas alın.", "Çapraz veya desenli döşemede fire payını yükseltin.", "Aynı alan için ton ve kalibre kodlarını eşleştirin."],
     fields: [
       { key: "length", label: "Uygulama uzunluğu", unit: "m", value: 4, min: 0.1, step: 0.1 },
       { key: "width", label: "Uygulama genişliği", unit: "m", value: 3, min: 0.1, step: 0.1 },
@@ -64,7 +65,6 @@ const tools = {
       { key: "piecesPerBox", label: "Kutudaki seramik adedi", unit: "adet", value: 4, min: 1, step: 1 },
       { key: "boxArea", label: "Kutunun kapladığı alan", unit: "m²", value: 1.44, min: 0, step: 0.01 },
       { key: "waste", label: "Kesim ve fire payı", unit: "%", value: 10, min: 0, max: 50, step: 1 },
-      { key: "boxPrice", label: "Kutu fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
     ],
     calculate: calculateTile,
   },
@@ -72,6 +72,7 @@ const tools = {
     title: "Duvar Kâğıdı Hesaplama",
     subtitle: "Duvar ölçülerine göre gereken rulo sayısını hesaplayın.",
     button: "Ruloyu hesapla",
+    formGuidance: ["Tüm duvarların genişliğini toplayın ve en yüksek noktayı kullanın.", "Desen yoksa desen tekrarını 0 bırakın.", "Rulo ölçülerini ürün etiketinden doğrulayın."],
     fields: [
       { key: "totalWallWidth", label: "Kaplanacak toplam duvar genişliği", unit: "m", value: 18, min: 0.1, step: 0.1 },
       { key: "wallHeight", label: "Duvar yüksekliği", unit: "m", value: 2.7, min: 0.1, step: 0.1 },
@@ -79,7 +80,6 @@ const tools = {
       { key: "rollLength", label: "Rulo uzunluğu", unit: "m", value: 10, min: 0.1, step: 0.1 },
       { key: "patternRepeat", label: "Desen tekrarı", unit: "cm", value: 0, min: 0, step: 1 },
       { key: "trim", label: "Şerit başına kesim payı", unit: "cm", value: 10, min: 0, step: 1 },
-      { key: "rollPrice", label: "Rulo fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
     ],
     calculate: calculateWallpaper,
   },
@@ -87,13 +87,13 @@ const tools = {
     title: "Duvar Paneli Hesaplama",
     subtitle: "Duvarınız için gereken panel adedini kolayca bulun.",
     button: "Paneli hesapla",
+    formGuidance: ["Panelin gerçek kaplama ölçüsünü kullanın.", "Hesap panellerin dikey yerleşimine göredir.", "Priz, köşe ve tesisat kesimlerini uygulama öncesinde planlayın."],
     fields: [
       { key: "wallWidth", label: "Duvar genişliği", unit: "m", value: 4, min: 0.1, step: 0.1 },
       { key: "wallHeight", label: "Duvar yüksekliği", unit: "m", value: 2.7, min: 0.1, step: 0.1 },
       { key: "panelWidth", label: "Panel genişliği", unit: "cm", value: 60, min: 1, step: 1 },
       { key: "panelHeight", label: "Panel yüksekliği", unit: "cm", value: 280, min: 1, step: 1 },
       { key: "waste", label: "Yedek ve fire payı", unit: "%", value: 5, min: 0, max: 50, step: 1 },
-      { key: "piecePrice", label: "Panel fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
     ],
     calculate: calculateWallPanel,
   },
@@ -101,14 +101,13 @@ const tools = {
     title: "Beton Hacmi Hesaplama",
     subtitle: "Döşeme veya temel için gereken beton hacmini hesaplayın.",
     button: "Betonu hesapla",
+    formGuidance: ["Kalınlığı santimetre olarak girin.", "Torba verimini ürün ambalajından kontrol edin.", "Taşıyıcı uygulamalarda beton sınıfı ve donatı için uzman görüşü alın."],
     fields: [
       { key: "length", label: "Uzunluk", unit: "m", value: 5, min: 0.1, step: 0.1 },
       { key: "width", label: "Genişlik", unit: "m", value: 3, min: 0.1, step: 0.1 },
       { key: "thickness", label: "Kalınlık", unit: "cm", value: 10, min: 1, step: 1 },
       { key: "bagYield", label: "Hazır karışım torbası verimi", unit: "L", value: 12, min: 1, step: 0.5 },
       { key: "waste", label: "Fire payı", unit: "%", value: 8, min: 0, max: 50, step: 1 },
-      { key: "pricePerM3", label: "Hazır beton fiyatı (isteğe bağlı)", unit: "TL/m³", value: 0, min: 0, step: 0.01 },
-      { key: "bagPrice", label: "Torba fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
     ],
     calculate: calculateConcrete,
   },
@@ -116,6 +115,7 @@ const tools = {
     title: "Tuğla ve Blok Hesaplama",
     subtitle: "Duvar alanına göre gereken tuğla veya blok adedini bulun.",
     button: "Tuğlayı hesapla",
+    formGuidance: ["Ürünün duvar yüzünde görülen uzunluk ve yüksekliğini girin.", "Kapı ve pencerelerin toplam alanını çıkarın.", "İnce yapıştırıcılı gazbetonda derz kalınlığını ürün talimatına göre değiştirin."],
     fields: [
       { key: "wallWidth", label: "Duvar genişliği", unit: "m", value: 5, min: 0.1, step: 0.1 },
       { key: "wallHeight", label: "Duvar yüksekliği", unit: "m", value: 2.7, min: 0.1, step: 0.1 },
@@ -124,7 +124,6 @@ const tools = {
       { key: "blockHeight", label: "Tuğla/blok yüksekliği", unit: "cm", value: 13.5, min: 1, step: 0.5 },
       { key: "joint", label: "Derz kalınlığı", unit: "mm", value: 10, min: 0, step: 1 },
       { key: "waste", label: "Kırılma ve fire payı", unit: "%", value: 8, min: 0, max: 50, step: 1 },
-      { key: "piecePrice", label: "Tuğla/blok fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
     ],
     calculate: calculateBrick,
   },
@@ -132,13 +131,13 @@ const tools = {
     title: "Süpürgelik Hesaplama",
     subtitle: "Oda çevresine göre gereken süpürgelik boyunu hesaplayın.",
     button: "Süpürgeliği hesapla",
+    formGuidance: ["Süpürgelik uygulanmayacak kapı açıklıklarının toplamını girin.", "Ürün boyunu ambalaj veya ürün bilgisinden kontrol edin.", "Çok köşeli odalarda fire payını artırın."],
     fields: [
       { key: "length", label: "Oda uzunluğu", unit: "m", value: 5, min: 0.1, step: 0.1 },
       { key: "width", label: "Oda genişliği", unit: "m", value: 4, min: 0.1, step: 0.1 },
       { key: "doorWidth", label: "Toplam kapı genişliği", unit: "m", value: 0.9, min: 0, step: 0.1 },
       { key: "pieceLength", label: "Bir süpürgelik boyu", unit: "m", value: 2.4, min: 0.1, step: 0.1 },
       { key: "waste", label: "Kesim ve fire payı", unit: "%", value: 10, min: 0, max: 50, step: 1 },
-      { key: "piecePrice", label: "Bir boyun fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
     ],
     calculate: calculateSkirting,
   },
@@ -146,6 +145,7 @@ const tools = {
     title: "Perde Kumaşı Hesaplama",
     subtitle: "Pile oranına göre gereken yaklaşık perde kumaşını bulun.",
     button: "Kumaşı hesapla",
+    formGuidance: ["Kornişin tamamını soldan sağa ölçün.", "Hesap, yüksekliği pencereye yeten boydan kumaş içindir.", "Desen tekrarı ve alt-üst kıvırmayı terzinizle ayrıca doğrulayın."],
     fields: [
       { key: "railWidth", label: "Korniş veya ray genişliği", unit: "m", value: 3, min: 0.1, step: 0.1 },
       {
@@ -163,7 +163,6 @@ const tools = {
       },
       { key: "panelCount", label: "Perde parçası", unit: "adet", value: 2, min: 1, step: 1 },
       { key: "sideHem", label: "Her parçada toplam yan kıvırma", unit: "cm", value: 20, min: 0, step: 1 },
-      { key: "meterPrice", label: "Kumaş metre fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
     ],
     calculate: calculateCurtain,
   },
@@ -171,6 +170,7 @@ const tools = {
     title: "Elektrik Tüketimi Hesaplama",
     subtitle: "Bir cihazın aylık elektrik tüketimini ve maliyetini hesaplayın.",
     button: "Tüketimi hesapla",
+    formGuidance: ["Cihaz gücünü ürün etiketindeki watt değerinden alın.", "Termostatlı cihazlar sürekli tam güçte çalışmayabilir.", "Maliyet için faturanızdaki güncel kWh birim fiyatını kullanın."],
     fields: [
       { key: "watts", label: "Cihaz gücü", unit: "W", value: 1500, min: 0, step: 1 },
       { key: "count", label: "Cihaz adedi", unit: "adet", value: 1, min: 1, step: 1 },
@@ -381,16 +381,16 @@ export function calculateParquet(input) {
   const requiredArea = withWaste(area, input.waste);
   const packs = Math.ceil(requiredArea / Math.max(0.01, positive(input.packArea)));
 
-  return result(
+  return completedResult(
     `${trNumber.format(packs)} paket parke`,
-    "Satın alınması önerilen miktar",
     [
-      ["Net zemin alanı", `${trNumber.format(rounded(area))} m²`],
-      ["Fire dahil ihtiyaç", `${trNumber.format(rounded(requiredArea))} m²`],
-      ["Paketlerin toplam alanı", `${trNumber.format(rounded(packs * positive(input.packArea)))} m²`],
-      ["Tahmini parke bedeli", estimatedCost(packs * positive(input.packPrice), input.packPrice)],
+      ["Net Zemin Alanı", `${trNumber.format(rounded(area))} m²`],
+      ["Fire Dahil Parke İhtiyacı", `${trNumber.format(rounded(requiredArea))} m²`],
+      ["Önerilen Paket Sayısı", `${trNumber.format(packs)} paket`],
+      ["Paketlerin Toplam Alanı", `${trNumber.format(rounded(packs * positive(input.packArea)))} m²`],
     ],
-    "Çapraz döşeme veya çok girintili alanlarda fire oranını yükseltin."
+    `Girdiğiniz ölçülere ve %${trNumber.format(positive(input.waste))} fire payına göre ${trNumber.format(packs)} paket parke gerekir. Paket alanını satın alacağınız ürünün ambalajından doğrulayın; çapraz veya çok köşeli döşemede fireyi artırın.`,
+    "Zemin ve paket ihtiyacınız aşağıda."
   );
 }
 
@@ -405,20 +405,19 @@ export function calculateTile(input) {
   const boxArea = statedBoxArea > 0 ? statedBoxArea : calculatedBoxArea;
   const boxes = Math.ceil(requiredArea / Math.max(0.0001, boxArea));
 
-  return result(
+  return completedResult(
     `${trNumber.format(boxes)} kutu seramik`,
-    `${trNumber.format(pieces)} adet yaklaşık ihtiyaç`,
     [
-      ["Net uygulama alanı", `${trNumber.format(rounded(area))} m²`],
-      ["Fire dahil alan", `${trNumber.format(rounded(requiredArea))} m²`],
-      ["Kutunun kapladığı alan", `${trNumber.format(rounded(boxArea))} m²`],
-      ["Kutudaki adet", `${trNumber.format(piecesPerBox)} adet`],
-      ["Satın alınan toplam", `${trNumber.format(rounded(boxes * boxArea))} m²`],
-      ["Tahmini seramik bedeli", estimatedCost(boxes * positive(input.boxPrice), input.boxPrice)],
+      ["Net Uygulama Alanı", `${trNumber.format(rounded(area))} m²`],
+      ["Fire Dahil Seramik İhtiyacı", `${trNumber.format(rounded(requiredArea))} m²`],
+      ["Bir Kutunun Kapladığı Alan", `${trNumber.format(rounded(boxArea))} m²`],
+      ["Önerilen Kutu Sayısı", `${trNumber.format(boxes)} kutu`],
+      ["Satın Alınan Toplam Alan", `${trNumber.format(rounded(boxes * boxArea))} m²`],
     ],
     statedBoxArea > 0
-      ? "Kutu hesabında ambalaj üzerindeki m² değeri esas alınır; ton ve kalibre kodlarını da kontrol edin."
-      : "Kutu m² değeri girilmediği için ürün ölçüsü ve kutu içi adet kullanıldı."
+      ? `Ambalaj üzerindeki kutu m² bilgisine göre ${trNumber.format(boxes)} kutu öneriyoruz. Kesim ve kırılma için %${trNumber.format(positive(input.waste))} pay eklendi; kutuların ton ve kalibre kodlarını eşleştirin.`
+      : `Kutu alanı girilmediği için ürün ölçüsü ve kutu içi adet kullanıldı. Satın almadan önce ambalajdaki toplam m² bilgisini doğrulayın.`,
+    "Alan ve kutu ihtiyacınız aşağıda."
   );
 }
 
@@ -432,28 +431,28 @@ export function calculateWallpaper(input) {
   const stripsPerRoll = Math.floor(positive(input.rollLength) / Math.max(0.01, stripLength));
 
   if (stripsPerRoll < 1) {
-    return result(
+    return completedResult(
       "Rulo uzunluğu yetersiz",
-      "Ölçüleri kontrol edin",
       [
-        ["Gerekli şerit boyu", `${trNumber.format(rounded(stripLength))} m`],
-        ["Girilen rulo uzunluğu", `${trNumber.format(rounded(positive(input.rollLength)))} m`],
+        ["Gerekli Şerit Boyu", `${trNumber.format(rounded(stripLength))} m`],
+        ["Girilen Rulo Uzunluğu", `${trNumber.format(rounded(positive(input.rollLength)))} m`],
       ],
-      "Bir tam şerit rulodan çıkmıyor. Daha uzun bir rulo seçin veya ölçüleri düzeltin."
+      "Bir tam şerit girdiğiniz rulodan çıkmıyor. Daha uzun bir rulo seçin veya duvar ve rulo ölçülerini yeniden kontrol edin.",
+      "Ölçülerinizi kontrol edin."
     );
   }
   const rolls = Math.ceil(stripsNeeded / stripsPerRoll);
 
-  return result(
+  return completedResult(
     `${trNumber.format(rolls)} rulo duvar kâğıdı`,
-    "Önerilen yaklaşık miktar",
     [
-      ["Gereken şerit", `${trNumber.format(stripsNeeded)} adet`],
-      ["Bir şeridin kesim boyu", `${trNumber.format(rounded(stripLength))} m`],
-      ["Bir rulodan çıkan", `${trNumber.format(stripsPerRoll)} şerit`],
-      ["Tahmini duvar kâğıdı bedeli", estimatedCost(rolls * positive(input.rollPrice), input.rollPrice)],
+      ["Gerekli Şerit Sayısı", `${trNumber.format(stripsNeeded)} adet`],
+      ["Bir Şeridin Kesim Boyu", `${trNumber.format(rounded(stripLength))} m`],
+      ["Bir Rulodan Çıkan Şerit", `${trNumber.format(stripsPerRoll)} adet`],
+      ["Önerilen Rulo Sayısı", `${trNumber.format(rolls)} rulo`],
     ],
-    "Desen eşleştirme ve duvar girintileri rulo ihtiyacını artırabilir."
+    `Duvar yüksekliği, kesim payı ve desen tekrarına göre bir rulodan ${trNumber.format(stripsPerRoll)} tam şerit çıkıyor. Toplam ${trNumber.format(rolls)} rulo öneriyoruz; desen eşleştirme ve duvar girintileri ihtiyacı artırabilir.`,
+    "Şerit ve rulo ihtiyacınız aşağıda."
   );
 }
 
@@ -464,16 +463,16 @@ export function calculateWallPanel(input) {
   const pieces = Math.ceil(withWaste(basePieces, input.waste));
   const wallArea = positive(input.wallWidth) * positive(input.wallHeight);
 
-  return result(
+  return completedResult(
     `${trNumber.format(pieces)} adet panel`,
-    "Yedek payı dahil önerilen miktar",
     [
-      ["Duvar alanı", `${trNumber.format(rounded(wallArea))} m²`],
-      ["Yatayda panel", `${trNumber.format(columns)} adet`],
-      ["Dikeyde sıra", `${trNumber.format(rows)} sıra`],
-      ["Tahmini panel bedeli", estimatedCost(pieces * positive(input.piecePrice), input.piecePrice)],
+      ["Net Duvar Alanı", `${trNumber.format(rounded(wallArea))} m²`],
+      ["Yatayda Gereken Panel", `${trNumber.format(columns)} adet`],
+      ["Dikeyde Gereken Sıra", `${trNumber.format(rows)} sıra`],
+      ["Fire Dahil Önerilen Panel", `${trNumber.format(pieces)} adet`],
     ],
-    "Hesap, panellerin dikey ve tam ölçülü yerleşimine göre yapılır."
+    `Panellerin dikey yerleşimine ve %${trNumber.format(positive(input.waste))} yedek payına göre ${trNumber.format(pieces)} adet panel öneriyoruz. Geçme payları, prizler ve köşe kesimleri için ürünün gerçek kaplama ölçüsünü doğrulayın.`,
+    "Duvar ve panel ihtiyacınız aşağıda."
   );
 }
 
@@ -482,17 +481,16 @@ export function calculateConcrete(input) {
   const orderVolume = withWaste(netVolume, input.waste);
   const bags = Math.ceil((orderVolume * 1000) / Math.max(0.1, positive(input.bagYield)));
 
-  return result(
+  return completedResult(
     `${trNumber.format(rounded(orderVolume, 2))} m³ beton`,
-    "Fire dahil yaklaşık sipariş hacmi",
     [
-      ["Net hacim", `${trNumber.format(rounded(netVolume, 2))} m³`],
-      ["Litre karşılığı", `${trNumber.format(Math.ceil(orderVolume * 1000))} L`],
-      ["Hazır karışım torbası", `${trNumber.format(bags)} adet`],
-      ["Hazır beton tahmini", estimatedCost(orderVolume * positive(input.pricePerM3), input.pricePerM3)],
-      ["Torbalı karışım tahmini", estimatedCost(bags * positive(input.bagPrice), input.bagPrice)],
+      ["Net Beton Hacmi", `${trNumber.format(rounded(netVolume, 2))} m³`],
+      ["Fire Dahil Önerilen Beton", `${trNumber.format(rounded(orderVolume, 2))} m³`],
+      ["Litre Karşılığı", `${trNumber.format(Math.ceil(orderVolume * 1000))} L`],
+      ["Hazır Karışım Torbası", `${trNumber.format(bags)} adet`],
     ],
-    "Taşıyıcı beton uygulamalarında sınıf ve miktar için mutlaka uzman görüşü alın."
+    `Ölçülerinize %${trNumber.format(positive(input.waste))} pay ekleyerek yaklaşık ${trNumber.format(rounded(orderVolume, 2))} m³ beton hesapladık. Torba hesabı girdiğiniz ürün verimine dayanır; taşıyıcı uygulamalarda beton sınıfı, donatı ve miktar için mutlaka uzman görüşü alın.`,
+    "Hacim ve yaklaşık malzeme ihtiyacınız aşağıda."
   );
 }
 
@@ -504,16 +502,16 @@ export function calculateBrick(input) {
   const basePieces = netArea / Math.max(0.0001, moduleArea);
   const pieces = Math.ceil(withWaste(basePieces, input.waste));
 
-  return result(
+  return completedResult(
     `${trNumber.format(pieces)} adet tuğla/blok`,
-    "Fire dahil yaklaşık miktar",
     [
-      ["Brüt duvar alanı", `${trNumber.format(rounded(grossArea))} m²`],
-      ["Net örülecek alan", `${trNumber.format(rounded(netArea))} m²`],
-      ["Metrekare başına", `${trNumber.format(rounded(1 / Math.max(0.0001, moduleArea), 1))} adet`],
-      ["Tahmini tuğla/blok bedeli", estimatedCost(pieces * positive(input.piecePrice), input.piecePrice)],
+      ["Brüt Duvar Alanı", `${trNumber.format(rounded(grossArea))} m²`],
+      ["Net Örülecek Alan", `${trNumber.format(rounded(netArea))} m²`],
+      ["Metrekare Başına Ürün", `${trNumber.format(rounded(1 / Math.max(0.0001, moduleArea), 1))} adet`],
+      ["Fire Dahil Önerilen Adet", `${trNumber.format(pieces)} adet`],
     ],
-    "Ürün ölçüsü ve uygulama biçimi üretici tavsiyesine göre kontrol edilmelidir."
+    `Kapı ve pencere alanları çıkarılıp derz ile %${trNumber.format(positive(input.waste))} kırılma payı eklendi. Yaklaşık ${trNumber.format(pieces)} adet ürün gerekir; ürün ölçüsü ve derz uygulamasını üretici tavsiyesine göre doğrulayın.`,
+    "Duvar alanı ve ürün ihtiyacınız aşağıda."
   );
 }
 
@@ -523,17 +521,17 @@ export function calculateSkirting(input) {
   const requiredLength = withWaste(netLength, input.waste);
   const pieces = Math.ceil(requiredLength / Math.max(0.01, positive(input.pieceLength)));
 
-  return result(
+  return completedResult(
     `${trNumber.format(pieces)} boy süpürgelik`,
-    "Satın alınması önerilen miktar",
     [
-      ["Oda çevresi", `${trNumber.format(rounded(perimeter))} m`],
-      ["Kapılar çıktıktan sonra", `${trNumber.format(rounded(netLength))} m`],
-      ["Fire dahil ihtiyaç", `${trNumber.format(rounded(requiredLength))} m`],
-      ["Satın alınan toplam", `${trNumber.format(rounded(pieces * positive(input.pieceLength)))} m`],
-      ["Tahmini süpürgelik bedeli", estimatedCost(pieces * positive(input.piecePrice), input.piecePrice)],
+      ["Oda Çevresi", `${trNumber.format(rounded(perimeter))} m`],
+      ["Kapılar Sonrası Net Uzunluk", `${trNumber.format(rounded(netLength))} m`],
+      ["Fire Dahil Süpürgelik İhtiyacı", `${trNumber.format(rounded(requiredLength))} m`],
+      ["Önerilen Ürün Boyu", `${trNumber.format(pieces)} boy`],
+      ["Satın Alınan Toplam Uzunluk", `${trNumber.format(rounded(pieces * positive(input.pieceLength)))} m`],
     ],
-    "Köşe sayısı arttıkça kesim firesi artabilir."
+    `Kapı açıklıkları çıkarılıp %${trNumber.format(positive(input.waste))} kesim payı eklendi. ${trNumber.format(pieces)} boy süpürgelik öneriyoruz; köşe sayısı arttıkça kesim firesi de artabilir.`,
+    "Çevre ve süpürgelik ihtiyacınız aşağıda."
   );
 }
 
@@ -542,16 +540,17 @@ export function calculateCurtain(input) {
   const hemAllowance = (positive(input.sideHem) / 100) * Math.max(1, positive(input.panelCount));
   const fabricMeters = finishedWidth + hemAllowance;
 
-  return result(
+  return completedResult(
     `${trNumber.format(rounded(fabricMeters, 1))} metre kumaş`,
-    "Boydan kumaş için yaklaşık ihtiyaç",
     [
-      ["Pileli toplam genişlik", `${trNumber.format(rounded(finishedWidth, 1))} m`],
-      ["Yan kıvırma payı", `${trNumber.format(rounded(hemAllowance, 1))} m`],
-      ["Pile oranı", `${trNumber.format(positive(input.fullness))} kat`],
-      ["Tahmini kumaş bedeli", estimatedCost(fabricMeters * positive(input.meterPrice), input.meterPrice)],
+      ["Korniş veya Ray Genişliği", `${trNumber.format(rounded(positive(input.railWidth), 1))} m`],
+      ["Seçilen Pile Oranı", `${trNumber.format(positive(input.fullness))} kat`],
+      ["Pileli Kumaş Genişliği", `${trNumber.format(rounded(finishedWidth, 1))} m`],
+      ["Yan Kıvırma Payı", `${trNumber.format(rounded(hemAllowance, 1))} m`],
+      ["Önerilen Kumaş Miktarı", `${trNumber.format(rounded(fabricMeters, 1))} m`],
     ],
-    "Hesap, yüksekliği yeterli boydan perde kumaşı içindir; desen ve dikim payı ayrıca kontrol edilmelidir."
+    `Seçtiğiniz ${trNumber.format(positive(input.fullness))} kat pile ve yan kıvırma payıyla yaklaşık ${trNumber.format(rounded(fabricMeters, 1))} metre boydan kumaş gerekir. Kumaş yüksekliği, desen tekrarı ve alt-üst kıvırma payını terzinizle doğrulayın.`,
+    "Pile ve kumaş ihtiyacınız aşağıda."
   );
 }
 
@@ -559,22 +558,31 @@ export function calculateElectricity(input) {
   const monthlyKwh = (positive(input.watts) * positive(input.count) * positive(input.hoursPerDay) * positive(input.daysPerMonth)) / 1000;
   const monthlyCost = monthlyKwh * positive(input.pricePerKwh);
   const annualCost = monthlyCost * 12;
+  const annualKwh = monthlyKwh * 12;
 
   const hasPrice = positive(input.pricePerKwh) > 0;
 
-  return result(
+  return completedResult(
     hasPrice
       ? `${trNumber.format(rounded(monthlyCost, 2))} TL / ay`
       : `${trNumber.format(rounded(monthlyKwh, 2))} kWh / ay`,
-    hasPrice ? "Tahmini aylık elektrik maliyeti" : "Tahmini aylık elektrik tüketimi",
     [
-      ["Aylık tüketim", `${trNumber.format(rounded(monthlyKwh, 2))} kWh`],
-      ["Günlük tüketim", `${trNumber.format(rounded(monthlyKwh / Math.max(1, positive(input.daysPerMonth)), 2))} kWh`],
-      ["Aylık maliyet", hasPrice ? `${trNumber.format(rounded(monthlyCost, 2))} TL` : "Birim fiyat girilmedi"],
-      ["Yıllık maliyet", hasPrice ? `${trNumber.format(rounded(annualCost, 2))} TL` : "Birim fiyat girilmedi"],
+      ["Günlük Tüketim", `${trNumber.format(rounded(monthlyKwh / Math.max(1, positive(input.daysPerMonth)), 2))} kWh`],
+      ["Aylık Tüketim", `${trNumber.format(rounded(monthlyKwh, 2))} kWh`],
+      ["Yıllık Tüketim", `${trNumber.format(rounded(annualKwh, 2))} kWh`],
+      ["Aylık Maliyet", hasPrice ? `${trNumber.format(rounded(monthlyCost, 2))} TL` : "Birim fiyat girilmedi"],
+      ["Yıllık Maliyet", hasPrice ? `${trNumber.format(rounded(annualCost, 2))} TL` : "Birim fiyat girilmedi"],
     ],
-    "Tarifenizdeki güncel vergiler ve kademeler gerçek faturayı değiştirebilir."
+    `Girdiğiniz güç ve kullanım süresine göre aylık yaklaşık ${trNumber.format(rounded(monthlyKwh, 2))} kWh tüketim hesapladık. ${hasPrice ? `Girdiğiniz birim fiyatla aylık maliyet yaklaşık ${trNumber.format(rounded(monthlyCost, 2))} TL olur.` : "Maliyet görmek için faturanızdaki güncel kWh birim fiyatını girebilirsiniz."} Termostat, bekleme tüketimi, tarife kademeleri ve vergiler gerçek faturayı değiştirebilir.`,
+    "Tüketim ve maliyet tahmininiz aşağıda."
   );
+}
+
+function completedResult(headline, items, note, subtitle = "Önerilen miktarlar aşağıda.") {
+  const output = result(headline, "Hesaplama tamamlandı", items, note);
+  output.noteTitle = "Ne Kadar Lazım’ın önerisi";
+  output.readyState = { title: "Hesabınız hazır", subtitle };
+  return output;
 }
 
 function result(headline, eyebrow, items, note) {
