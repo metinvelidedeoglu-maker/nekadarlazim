@@ -7,7 +7,7 @@ const trNumber = new Intl.NumberFormat("tr-TR", {
 const tools = {
   boya: {
     title: "Duvar Boyası Hesaplama",
-    subtitle: "Odanızın duvarları için gereken yaklaşık boya miktarını hesaplayın. Tavan bu hesaba dahil değildir.",
+    subtitle: "Odanızın duvarları ve tavanı için gereken yaklaşık boya miktarını hesaplayın.",
     button: "Boyayı hesapla",
     fields: [
       { key: "length", label: "Oda uzunluğu", unit: "m", value: 5, min: 0.1, step: 0.1 },
@@ -16,10 +16,6 @@ const tools = {
       { key: "doorArea", label: "Toplam kapı alanı", unit: "m²", value: 2, min: 0, step: 0.1 },
       { key: "windowArea", label: "Toplam pencere alanı", unit: "m²", value: 3, min: 0, step: 0.1 },
       { key: "coats", label: "Kat sayısı", unit: "kat", value: 2, min: 1, step: 1 },
-      { key: "coverage", label: "Tek katta kaplama alanı", unit: "m²/L", value: 10, min: 1, step: 0.5 },
-      { key: "waste", label: "Fire payı", unit: "%", value: 10, min: 0, max: 50, step: 1 },
-      { key: "canSize", label: "Boya ambalajı", unit: "L", value: 10, min: 0.1, step: 0.1 },
-      { key: "canPrice", label: "Ambalaj fiyatı (isteğe bağlı)", unit: "TL", value: 0, min: 0, step: 0.01 },
     ],
     calculate: calculatePaint,
   },
@@ -205,26 +201,29 @@ function estimatedCost(total, unitPrice) {
 }
 
 export function calculatePaint(input) {
+  const coverage = 10;
+  const waste = 10;
+  const coats = Math.max(1, positive(input.coats));
   const grossArea = 2 * (positive(input.length) + positive(input.width)) * positive(input.height);
   const netArea = Math.max(0, grossArea - positive(input.doorArea) - positive(input.windowArea));
-  const coatedArea = netArea * Math.max(1, positive(input.coats));
-  const liters = withWaste(coatedArea / Math.max(0.01, positive(input.coverage)), input.waste);
-  const canSize = positive(input.canSize) > 0 ? positive(input.canSize) : 10;
-  const cans = Math.ceil(liters / canSize);
-  const purchasedLiters = cans * canSize;
+  const ceilingArea = positive(input.length) * positive(input.width);
+  const coatedWallArea = netArea * coats;
+  const coatedCeilingArea = ceilingArea * coats;
+  const wallLiters = withWaste(coatedWallArea / coverage, waste);
+  const ceilingLiters = withWaste(coatedCeilingArea / coverage, waste);
+  const totalLiters = wallLiters + ceilingLiters;
 
   return result(
-    `${trNumber.format(rounded(liters, 1))} litre boya`,
-    "Önerilen yaklaşık miktar",
+    `${trNumber.format(rounded(totalLiters, 1))} litre toplam boya`,
+    "Duvar ve tavan için yaklaşık ihtiyaç",
     [
       ["Boyanacak net duvar", `${trNumber.format(rounded(netArea))} m²`],
-      ["Katlarla birlikte alan", `${trNumber.format(rounded(coatedArea))} m²`],
-      ["Fire dahil boya", `${trNumber.format(rounded(liters, 1))} L`],
-      ["Satın alınacak ambalaj", `${trNumber.format(cans)} × ${trNumber.format(rounded(canSize, 1))} L`],
-      ["Satın alınan toplam", `${trNumber.format(rounded(purchasedLiters, 1))} L`],
-      ["Tahmini boya bedeli", estimatedCost(cans * positive(input.canPrice), input.canPrice)],
+      ["Tavan alanı", `${trNumber.format(rounded(ceilingArea))} m²`],
+      ["Duvar için gereken", `${trNumber.format(rounded(wallLiters, 1))} L`],
+      ["Tavan için gereken", `${trNumber.format(rounded(ceilingLiters, 1))} L`],
+      ["Toplam boya ihtiyacı", `${trNumber.format(rounded(totalLiters, 1))} L`],
     ],
-    "Yüzey emiciliği, renk değişimi ve boya türü gerçek tüketimi etkileyebilir."
+    "Hesapta tek katta 10 m²/L kaplama ve %10 uygulama payı kullanılır. Duvar ve tavan boyaları ayrı ürünlerse miktarları ayrı değerlendirin."
   );
 }
 
