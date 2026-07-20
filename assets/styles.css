@@ -812,6 +812,41 @@ body:not(.ads-enabled) .ad-slot {
   display: block;
 }
 
+.result-ready {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.result-ready-icon {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  color: var(--brand-dark);
+  background: white;
+  border-radius: 50%;
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+.result-ready strong,
+.result-ready div > span {
+  display: block;
+}
+
+.result-ready strong {
+  color: white;
+  font-size: 1.25rem;
+}
+
+.result-ready div > span {
+  margin-top: 0.15rem;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.82rem;
+}
+
 .result-heading span {
   color: rgba(255, 255, 255, 0.75);
   font-size: 0.82rem;
