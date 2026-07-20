@@ -223,7 +223,7 @@ export function calculatePaint(input) {
       ["Tavan için gereken", `${trNumber.format(rounded(ceilingLiters, 1))} L`],
       ["Toplam boya ihtiyacı", `${trNumber.format(rounded(totalLiters, 1))} L`],
     ],
-    "Hesapta tek katta 10 m²/L kaplama ve %10 uygulama payı kullanılır. Duvar ve tavan boyaları ayrı ürünlerse miktarları ayrı değerlendirin."
+    "Yüzey emiciliği ve boya türü gerçek tüketimi etkileyebilir. Duvar ve tavan boyaları ayrı ürünlerse miktarları ayrı değerlendirin."
   );
 }
 
