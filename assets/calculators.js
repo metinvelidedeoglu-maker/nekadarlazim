@@ -383,11 +383,13 @@ export function calculatePaint(input) {
   const primerCoverage = 10;
   const recommendation = recommendPaintCoats(input.currentCondition, input.desiredCondition);
   const surfaceText = normalizedDescription(`${input.currentCondition || ""} ${input.desiredCondition || ""}`);
-  const repairNeeded = /catlak|delik|yama|kabarm|dokul/.test(surfaceText);
+  const repairNeeded = /catlak|delik|yama|kabarm|dokul|kagit|tutkal/.test(surfaceText);
   const wallCoats = recommendation.coats;
   const ceilingCoats = input.paintCeiling === false ? 0 : 2;
   const grossArea = 2 * (positive(input.length) + positive(input.width)) * positive(input.height);
-  const netArea = Math.max(0, grossArea - positive(input.doorArea) - positive(input.windowArea));
+  const openingArea = positive(input.doorArea) + positive(input.windowArea);
+  const measurementWarning = openingArea > grossArea;
+  const netArea = Math.max(0, grossArea - openingArea);
   const ceilingArea = positive(input.length) * positive(input.width);
   const coatedWallArea = netArea * wallCoats;
   const coatedCeilingArea = ceilingArea * ceilingCoats;
@@ -426,8 +428,9 @@ export function calculatePaint(input) {
       ["Tavan Boyası Kaç Kat Uygulanmalı", ceilingStatus],
       ["Tavan İçin Önerilen Boya Miktarı", ceilingAmount],
       ["Yüzey Düzeltme Malzemesi", repairNeeded ? "Macun / tamir harcı gerekebilir" : "Belirgin ihtiyaç algılanmadı"],
+      ...(measurementWarning ? [["Ölçü Kontrolü", "Kapı ve pencere alanı toplam duvar alanından büyük; ölçüleri düzeltin"]] : []),
     ],
-    `${recommendation.warning} ${recommendation.reason} Duvar için ${wallCoats} kat ve yaklaşık ${trNumber.format(rounded(wallLiters, 1))} litre boya hesapladık. ${primerAdvice} ${ceilingAdvice} İstediğiniz renk tonunu mağazada markanın kartelasından seçip hazırlatabilir, ürünün ambalaj seçeneklerine göre miktarı yukarı tamamlayabilirsiniz.`.trim()
+    `${measurementWarning ? "Kapı ve pencere alanları toplam duvar alanını aştığı için duvar miktarı güvenilir değildir; ölçüleri düzeltin. " : ""}${recommendation.warning} ${recommendation.reason} Duvar için ${wallCoats} kat ve yaklaşık ${trNumber.format(rounded(wallLiters, 1))} litre boya hesapladık. ${primerAdvice} ${ceilingAdvice} İstediğiniz renk tonunu mağazada markanın kartelasından seçip hazırlatabilir, ürünün ambalaj seçeneklerine göre miktarı yukarı tamamlayabilirsiniz.`.trim()
   );
   output.noteTitle = "Ne Kadar Lazım’ın önerisi";
   output.readyState = {
@@ -444,9 +447,10 @@ export function calculatePaint(input) {
     ],
     steps: recommendation.moistureProblem
       ? ["Nem veya su kaynağını bulun ve tamamen giderin.", "Kabarmış ve gevşek katmanları temizleyip yüzeyi kurutun.", "Yüzeyi yeniden değerlendirip uygun astar ve boya sistemini seçin."]
-      : ["Yüzeyi temizleyin; gevşek boya, çatlak ve delikleri onarın.", primerLiters > 0 ? "Uygun astarı tek kat uygulayın ve kurumasını bekleyin." : "Sağlam, temiz ve kuru yüzeyde astar gerekip gerekmediğini kontrol edin.", `${wallCoats} kat duvar boyasını katlar arasında kuruma süresi bırakarak uygulayın.`, ceilingCoats > 0 ? "Tavanı duvardan önce boyayın; ardından duvarlara geçin." : "Son kat sonrası maskeleme bantlarını boya kurumadan dikkatlice sökün."],
+      : [recommendation.preparation || "Yüzeyi temizleyin; gevşek boya, çatlak ve delikleri onarın.", primerLiters > 0 ? "Uygun astarı tek kat uygulayın ve kurumasını bekleyin." : "Sağlam, temiz ve kuru yüzeyde astar gerekip gerekmediğini kontrol edin.", `${wallCoats} kat duvar boyasını katlar arasında kuruma süresi bırakarak uygulayın.`, ceilingCoats > 0 ? "Tavanı duvardan önce boyayın; ardından duvarlara geçin." : "Son kat sonrası maskeleme bantlarını boya kurumadan dikkatlice sökün."],
     checks: [
       recommendation.warning || "Yüzey sağlam, temiz ve tamamen kuru olmalı.",
+      ...(measurementWarning ? ["Kapı ve pencere ölçülerini yeniden kontrol edin; boşluk alanı duvar alanından büyük olamaz."] : []),
       "Renk ve parlaklığı önce küçük bir deneme alanında kontrol edin.",
       "Ambalajdaki sarfiyat, inceltme ve katlar arası bekleme talimatını esas alın.",
     ],
@@ -587,14 +591,23 @@ export function recommendPaintCoats(currentCondition, desiredCondition) {
   const current = normalizedDescription(currentCondition);
   const desired = normalizedDescription(desiredCondition);
   const combined = `${current} ${desired}`;
-  const mentions = (text, words) => words.some((word) => ` ${text} `.includes(` ${word} `));
+  const mentions = (text, words) => words.some((word) => {
+    const normalizedWord = normalizedDescription(word);
+    if (normalizedWord.includes(" ") || normalizedWord.length < 4) {
+      return ` ${text} `.includes(` ${normalizedWord} `);
+    }
+    return text.split(" ").some((token) => token === normalizedWord || token.startsWith(normalizedWord));
+  });
 
   const currentIsDark = mentions(current, ["koyu", "siyah", "lacivert", "bordo", "kirmizi", "kahverengi", "antrasit"]);
   const desiredIsLight = mentions(desired, ["acik", "beyaz", "krem", "bej", "fildisi", "kirik beyaz"]);
-  const stainedSurface = mentions(combined, ["lekeli", "leke", "nikotin", "isli", "is", "yagli", "yag lekesi"]);
+  const stainedSurface = mentions(combined, ["lekeli", "leke", "nikotin", "isli", "is", "yag lekesi", "su lekesi"]);
   const unevenSurface = mentions(combined, ["yamali", "yama", "macunlu", "farkli emicilik", "catlak", "catlakli"]);
-  const rawSurface = mentions(combined, ["yeni siva", "ham siva", "yeni alci", "ham alci", "alcili", "ham yuzey", "ciplak yuzey", "cok emici", "yeni beton"]);
-  const moistureProblem = mentions(combined, ["rutubet", "rutubetli", "nem", "nemli", "islak", "su aliyor", "kabarma", "kabarmis", "dokulme", "dokuluyor"]);
+  const rawSurface = mentions(combined, ["yeni siva", "ham siva", "yeni alci", "ham alci", "alcili", "alcipan", "saten alci", "ham yuzey", "ciplak yuzey", "cok emici", "yeni beton"]);
+  const moistureProblem = mentions(combined, ["rutubet", "rutubetli", "nem", "nemli", "islak", "su aliyor", "kabar", "dokul", "kuf", "kuflu"]);
+  const oilPaintSurface = mentions(current, ["yagli boya", "sentetik boya", "solvent bazli"]);
+  const glossySurface = mentions(current, ["parlak", "saten boya", "ipek mat"]);
+  const wallpaperRemoved = mentions(current, ["duvar kagidi sokuldu", "kagit sokuldu", "tutkal kalintisi", "duvar kagidi vardi"]);
   const colorTransition = currentIsDark && desiredIsLight;
 
   if (moistureProblem) {
@@ -607,6 +620,7 @@ export function recommendPaintCoats(currentCondition, desiredCondition) {
       primerNote: "Astar tek başına rutubet sorununu çözmez.",
       moistureProblem: true,
       warning: "Yüzeydeki nem veya su kaynağını giderip gevşek katmanları temizlemeden boyaya başlamayın.",
+      preparation: "Nem kaynağını giderin; küf, kabarma ve gevşek katmanları uygun yöntemle temizleyip yüzeyi tamamen kurutun.",
       interpretation: "Yüzeyde aktif nem, rutubet veya kabarma olabileceğini anladık; önce sorunun kaynağı giderilmeli.",
     };
   }
@@ -621,7 +635,39 @@ export function recommendPaintCoats(currentCondition, desiredCondition) {
       primerNote: "Ürünü lekenin türüne uygun seçin.",
       moistureProblem: false,
       warning: "",
+      preparation: "Lekenin kaynağını temizleyin; leke geçişini kesen uygun astarı boya öncesinde uygulayın.",
       interpretation: `Yüzeyin lekeli, isli veya nikotinli olduğunu anladık${colorTransition ? "; ayrıca koyu renkten açık renge geçilecek" : ""}.`,
+    };
+  }
+
+  if (oilPaintSurface || glossySurface || wallpaperRemoved) {
+    const primerLabel = oilPaintSurface
+      ? "Geçiş / aderans astarı gerekli"
+      : wallpaperRemoved
+        ? "Yüzey düzenleyici astar önerilir"
+        : "Aderans astarı önerilir";
+    const reason = oilPaintSurface
+      ? "Yağlı veya sentetik boyalı yüzey üzerine yeni boya tarif edildi."
+      : wallpaperRemoved
+        ? "Sökülmüş duvar kâğıdı sonrası yüzey tarif edildi."
+        : "Parlak veya düşük emicilikte bir yüzey tarif edildi.";
+    return {
+      coats: colorTransition ? 3 : 2,
+      reason: `${reason}${colorTransition ? " Ayrıca koyu renkten açık renge geçiş tarif edildi." : ""}`,
+      primerRequired: oilPaintSurface,
+      primerRecommended: !oilPaintSurface,
+      primerLabel,
+      primerNote: "Yüzeyi matlaştırıp temizledikten sonra yeni boya sistemine uygun astar kullanın.",
+      moistureProblem: false,
+      warning: wallpaperRemoved ? "Kalan tutkalı tamamen temizlemeden boyaya başlamayın." : "Parlak yüzeyi temizleyip hafifçe matlaştırmadan doğrudan boyamayın.",
+      preparation: `${wallpaperRemoved
+        ? "Duvar kâğıdı tutkalını temizleyin; yırtık, çukur ve emicilik farklarını düzeltip yüzeyi astarlayın."
+        : "Yüzeyi yağdan arındırın, hafifçe zımparalayıp tozunu alın ve uygun geçiş/aderans astarı uygulayın."}${unevenSurface ? " Çatlak ve yamaları uygun dolgu ile onarıp zımparalayın." : ""}`,
+      interpretation: oilPaintSurface
+        ? `Mevcut yüzeyin yağlı veya sentetik boyalı olduğunu anladık; yüzey hazırlığı ve geçiş astarı sonrası ${colorTransition ? 3 : 2} kat boya öneriyoruz.${unevenSurface ? " Çatlak veya yama onarımı da gerekiyor." : ""}`
+        : wallpaperRemoved
+          ? `Duvar kâğıdının söküldüğünü anladık; tutkal temizliği, yüzey düzeltme ve astar sonrası ${colorTransition ? 3 : 2} kat boya öneriyoruz.`
+          : `Yüzeyin parlak veya düşük emicilikte olduğunu anladık; matlaştırma ve aderans astarı sonrası ${colorTransition ? 3 : 2} kat boya öneriyoruz.${unevenSurface ? " Çatlak veya yama onarımı da gerekiyor." : ""}`,
     };
   }
 
@@ -635,6 +681,7 @@ export function recommendPaintCoats(currentCondition, desiredCondition) {
       primerNote: "Boyadan önce yüzeye uygun tek kat astar uygulayın.",
       moistureProblem: false,
       warning: "",
+      preparation: "Yeni veya çok emici yüzeyi temizleyin; uygun astarla emiciliği dengeleyin.",
       interpretation: "Yüzeyin yeni sıva, alçı veya çok emici olduğunu anladık; astar sonrası 2 kat boya uygun görünüyor.",
     };
   }
@@ -649,6 +696,9 @@ export function recommendPaintCoats(currentCondition, desiredCondition) {
       primerNote: "Astar, son kat rengin daha dengeli görünmesine yardımcı olabilir.",
       moistureProblem: false,
       warning: "",
+      preparation: unevenSurface
+        ? "Çatlak ve yamaları onarın, zımparalayıp yüzeyin emiciliğini astarla eşitleyin."
+        : "Yüzeyi temizleyin; renk geçişini dengelemek için uygun geçiş astarı uygulayın.",
       interpretation: colorTransition
         ? "Mevcut rengin koyu, istenen rengin açık olduğunu anladık; geçiş astarı ve 3 kat boya öneriyoruz."
         : "Yüzeyin yamalı, çatlaklı veya farklı emicilikte olduğunu anladık; yüzey astarı öneriyoruz.",
@@ -664,6 +714,7 @@ export function recommendPaintCoats(currentCondition, desiredCondition) {
     primerNote: "Yüzeyin sağlam, temiz ve kuru olduğunu uygulama öncesinde kontrol edin.",
     moistureProblem: false,
     warning: "",
+    preparation: "Yüzeyi temizleyin; gevşek katman olmadığını ve tamamen kuru olduğunu kontrol edin.",
     interpretation: current || desired
       ? "Belirgin bir yüzey sorunu veya zorlu renk geçişi algılamadık; standart 2 kat boya hesaplıyoruz."
       : "Henüz yüzey tarifi girilmedi; standart, sağlam ve kuru bir yüzey kabul ediyoruz.",
