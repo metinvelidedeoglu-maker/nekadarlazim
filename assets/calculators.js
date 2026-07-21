@@ -66,7 +66,7 @@ const tools = {
     title: "Seramik Hesaplama",
     subtitle: "Zemin veya duvar için gereken seramik alanını ve kutu sayısını hesaplayın.",
     button: "Seramiği hesapla",
-    formGuidance: ["Kutu üzerindeki toplam m² bilgisini esas alın.", "Uygulama yeri ve döşeme biçimine göre kesim payını sistem otomatik ekler.", "Kaplanmayacak alan yoksa boşluk değerini 0 bırakın.", "Aynı alan için ton ve kalibre kodlarını eşleştirin."],
+    formGuidance: ["Kutu üzerindeki toplam m² bilgisini esas alın.", "Uygulama yeri ve döşeme biçimine göre kesim payını sistem otomatik ekler.", "Seramik üzerindeki desen veya damarların birbirini takip etmesi gerekiyorsa ‘Deseni takip eden döşeme’ seçin.", "Kaplanmayacak alan yoksa boşluk değerini 0 bırakın.", "Aynı alan için ton ve kalibre kodlarını eşleştirin."],
     fields: [
       {
         key: "applicationType",
@@ -89,7 +89,7 @@ const tools = {
         options: [
           { value: 10, label: "Düz döşeme" },
           { value: 15, label: "Çapraz döşeme" },
-          { value: 16, label: "Desenli / yönlü döşeme" },
+          { value: 16, label: "Deseni takip eden döşeme" },
         ],
       },
       { key: "boxArea", label: "Bir kutunun kapladığı alan", unit: "m²", value: 1.44, min: 0.01, step: 0.01 },
@@ -220,7 +220,7 @@ const multiTools = {
 const toolTips = {
   boya: ["Duvarları metre cinsinden ölçün.", "Kapı ve pencerelerin toplam alanını yaklaşık girebilirsiniz.", "Yeni sıva, rutubet ve koyu renk geçişini açıklamada belirtin.", "Tavan boyanmayacaksa işareti kaldırın.", "Aynı boya kullanılacak odaları tek projede toplayın.", "Son kat rengini küçük bir alanda denemek faydalıdır."],
   parke: ["Paket m² bilgisini ürün ambalajından alın.", "Düz ve çapraz döşemeyi doğru seçin.", "Sabit dolap altında parke olmayacaksa o alanı ölçüden çıkarın.", "Tüm paketlerde aynı üretim serisini tercih edin.", "Artan birkaç parçayı ilerideki onarımlar için saklayın.", "Çok girintili odalarda uygulayıcıyla miktarı doğrulayın."],
-  seramik: ["Kutu üzerindeki toplam m² bilgisini esas alın.", "Duvar ve zemini ayrı alanlar olarak ekleyin.", "Kapı, pencere veya kaplanmayacak büyük bölümleri boşluk alanına yazın.", "Ton ve kalibre kodları aynı kutuları seçin.", "Desenli veya çapraz döşemeyi doğru seçin.", "Niş, kolon ve girintileri ayrı alan olarak ekleyebilirsiniz.", "Islak hacimlerde kaymazlık sınıfını kullanım yerine göre seçin.", "Yedek birkaç seramiği ilerideki onarımlar için saklayın."],
+  seramik: ["Kutu üzerindeki toplam m² bilgisini esas alın.", "Duvar ve zemini ayrı alanlar olarak ekleyin.", "Kapı, pencere veya kaplanmayacak büyük bölümleri boşluk alanına yazın.", "Ton ve kalibre kodları aynı kutuları seçin.", "Desen veya damarlar devam edecekse ‘Deseni takip eden döşeme’ seçin.", "Niş, kolon ve girintileri ayrı alan olarak ekleyebilirsiniz.", "Islak hacimlerde kaymazlık sınıfını kullanım yerine göre seçin.", "Yedek birkaç seramiği ilerideki onarımlar için saklayın."],
   "duvar-kagidi": ["Aynı yükseklikteki duvarların genişliklerini toplayabilirsiniz.", "Desen tekrarını rulo etiketinden alın.", "Kapı ve pencereleri çoğu küçük uygulamada düşmemek güvenlidir.", "Farklı parti rulolarda renk tonu değişebilir.", "İlk ve son şeritlerde ek kesim gerekebilir.", "Duvarın en yüksek noktasını ölçün."],
   "duvar-paneli": ["Nominal değil gerçek kaplama ölçüsünü kullanın.", "Her duvarı ayrı eklemek köşe kesimlerini daha doğru gösterir.", "Priz ve anahtar yerlerini önceden işaretleyin.", "Köşe profillerini ayrıca planlayın.", "Panelleri montajdan önce ortamda dinlendirin.", "Kesim yönünü ürün desenine göre belirleyin."],
   beton: ["Kalınlığı santimetre olarak girin.", "Farklı kalınlıktaki bölümleri ayrı ekleyin.", "Zemindeki kot farklarını ölçün.", "Torba verimini ambalajdan doğrulayın.", "Taşıyıcı işlerde mühendis görüşü alın.", "Pompa ve taşıma kayıplarını tedarikçiyle konuşun."],
@@ -449,7 +449,7 @@ export function calculateTile(input) {
   const applicationLabel = positive(input.applicationType) === 2 ? "Duvar" : "Zemin";
   const layoutValue = positive(input.layoutStyle);
   const waste = layoutValue >= 15 ? 15 : 10;
-  const layoutLabel = layoutValue === 15 ? "Çapraz döşeme" : layoutValue === 16 ? "Desenli / yönlü döşeme" : "Düz döşeme";
+  const layoutLabel = layoutValue === 15 ? "Çapraz döşeme" : layoutValue === 16 ? "Deseni takip eden döşeme" : "Düz döşeme";
   const grossArea = positive(input.length) * positive(input.width);
   const excludedArea = Math.min(grossArea, positive(input.excludedArea));
   const area = Math.max(0, grossArea - excludedArea);
