@@ -43,6 +43,7 @@ const tools = {
     title: "Parke Hesaplama",
     subtitle: "Odanız için gereken parke alanını ve paket sayısını bulun.",
     button: "Parkeyi hesapla",
+    showInterpretation: true,
     formGuidance: ["Paketin kapladığı m² bilgisini ürün ambalajından alın.", "Parkenin düz mü, çapraz mı döşeneceğini seçin; uygun kesim payını sistem ekler."],
     fields: [
       { key: "length", label: "Oda uzunluğu", unit: "m", value: 5, min: 0.1, step: 0.1 },
@@ -61,6 +62,7 @@ const tools = {
       },
       { key: "moistureConcern", label: "Zeminde nem şüphesi var", type: "checkbox", value: false },
       { key: "floorHeating", label: "Yerden ısıtma var", type: "checkbox", value: false },
+      { key: "projectDescription", label: "Projenizi tarif edin", type: "textarea", value: "", placeholder: "Örn. Eski seramik zemin üzerine açık renk parke döşeyeceğim; girişte biraz nem var." },
     ],
     calculate: calculateParquet,
   },
@@ -68,6 +70,7 @@ const tools = {
     title: "Seramik Hesaplama",
     subtitle: "Zemin veya duvar için gereken seramik alanını ve kutu sayısını hesaplayın.",
     button: "Seramiği hesapla",
+    showInterpretation: true,
     formGuidance: ["Kutu üzerindeki toplam m² bilgisini esas alın.", "Uygulama yeri ve döşeme biçimine göre kesim payını sistem otomatik ekler.", "Seramik üzerindeki desen veya damarların birbirini takip etmesi gerekiyorsa ‘Deseni takip eden döşeme’ seçin.", "Kaplanmayacak alan yoksa boşluk değerini 0 bırakın.", "Aynı alan için ton ve kalibre kodlarını eşleştirin."],
     fields: [
       {
@@ -118,6 +121,7 @@ const tools = {
         ],
       },
       { key: "floorHeating", label: "Yerden ısıtma var", type: "checkbox", value: false },
+      { key: "projectDescription", label: "Projenizi tarif edin", type: "textarea", value: "", placeholder: "Örn. Banyoda eski fayans üzerine 60×120 seramik döşeyeceğim." },
       { key: "boxArea", label: "Bir kutunun kapladığı alan", unit: "m²", value: 1.44, min: 0.01, step: 0.01 },
       { key: "sameProduct", label: "Tüm alanlarda aynı seramik kullanılacak", type: "checkbox", value: true },
     ],
@@ -127,6 +131,7 @@ const tools = {
     title: "Duvar Kâğıdı Hesaplama",
     subtitle: "Duvar ölçülerine göre gereken rulo sayısını hesaplayın.",
     button: "Ruloyu hesapla",
+    showInterpretation: true,
     formGuidance: ["Tüm duvarların genişliğini toplayın ve en yüksek noktayı kullanın.", "Desen yoksa desen tekrarını 0 bırakın.", "Rulo ölçülerini ürün etiketinden doğrulayın."],
     fields: [
       { key: "totalWallWidth", label: "Kaplanacak toplam duvar genişliği", unit: "m", value: 18, min: 0.1, step: 0.1 },
@@ -146,6 +151,7 @@ const tools = {
         ],
       },
       { key: "moistureConcern", label: "Duvarda nem veya kabarma var", type: "checkbox", value: false },
+      { key: "projectDescription", label: "Projenizi tarif edin", type: "textarea", value: "", placeholder: "Örn. Salon duvarı yeni alçılı; büyük desenli vinil kâğıt uygulayacağım." },
     ],
     calculate: calculateWallpaper,
   },
@@ -153,6 +159,7 @@ const tools = {
     title: "Duvar Paneli Hesaplama",
     subtitle: "Duvarınız için gereken panel adedini kolayca bulun.",
     button: "Paneli hesapla",
+    showInterpretation: true,
     formGuidance: ["Panelin gerçek kaplama ölçüsünü kullanın.", "Hesap panellerin dikey yerleşimine göredir.", "Priz, köşe ve tesisat kesimlerini uygulama öncesinde planlayın."],
     fields: [
       { key: "wallWidth", label: "Duvar genişliği", unit: "m", value: 4, min: 0.1, step: 0.1 },
@@ -170,6 +177,7 @@ const tools = {
         ],
       },
       { key: "wetArea", label: "Nemli veya ıslak hacimde kullanılacak", type: "checkbox", value: false },
+      { key: "projectDescription", label: "Projenizi tarif edin", type: "textarea", value: "", placeholder: "Örn. TV arkasına ahşap görünümlü paneli yapıştırarak uygulayacağım." },
     ],
     calculate: calculateWallPanel,
   },
@@ -177,6 +185,7 @@ const tools = {
     title: "Beton Hacmi Hesaplama",
     subtitle: "Döşeme veya temel için gereken beton hacmini hesaplayın.",
     button: "Betonu hesapla",
+    showInterpretation: true,
     formGuidance: ["Kalınlığı santimetre olarak girin.", "Torba verimini ürün ambalajından kontrol edin.", "Taşıyıcı uygulamalarda beton sınıfı ve donatı için uzman görüşü alın."],
     fields: [
       { key: "length", label: "Uzunluk", unit: "m", value: 5, min: 0.1, step: 0.1 },
@@ -193,6 +202,7 @@ const tools = {
           { value: 2, label: "Temel / kolon / taşıyıcı döşeme" },
         ],
       },
+      { key: "projectDescription", label: "Projenizi tarif edin", type: "textarea", value: "", placeholder: "Örn. Bahçede otomobil park edeceğim bir beton alan yapacağım." },
     ],
     calculate: calculateConcrete,
   },
@@ -200,6 +210,7 @@ const tools = {
     title: "Tuğla ve Blok Hesaplama",
     subtitle: "Duvar alanına göre gereken tuğla veya blok adedini bulun.",
     button: "Tuğlayı hesapla",
+    showInterpretation: true,
     formGuidance: ["Ürünün duvar yüzünde görülen uzunluk ve yüksekliğini girin.", "Kapı ve pencerelerin toplam alanını çıkarın.", "Derz ve kırılma payını sistem otomatik uygular."],
     fields: [
       { key: "wallWidth", label: "Duvar genişliği", unit: "m", value: 5, min: 0.1, step: 0.1 },
@@ -218,6 +229,7 @@ const tools = {
         ],
       },
       { key: "loadBearing", label: "Taşıyıcı veya dış duvar", type: "checkbox", value: false },
+      { key: "projectDescription", label: "Projenizi tarif edin", type: "textarea", value: "", placeholder: "Örn. Balkonda dışarıya bakan gazbeton bir duvar öreceğim." },
     ],
     calculate: calculateBrick,
   },
@@ -225,6 +237,7 @@ const tools = {
     title: "Süpürgelik Hesaplama",
     subtitle: "Oda çevresine göre gereken süpürgelik boyunu hesaplayın.",
     button: "Süpürgeliği hesapla",
+    showInterpretation: true,
     formGuidance: ["Süpürgelik uygulanmayacak kapı açıklıklarının toplamını girin.", "Ürün boyunu ambalaj veya ürün bilgisinden kontrol edin.", "Standart kesim payını sistem otomatik ekler."],
     fields: [
       { key: "length", label: "Oda uzunluğu", unit: "m", value: 5, min: 0.1, step: 0.1 },
@@ -241,6 +254,7 @@ const tools = {
           { value: 2, label: "Klipsli / vidalı" },
         ],
       },
+      { key: "projectDescription", label: "Projenizi tarif edin", type: "textarea", value: "", placeholder: "Örn. Yeni parkeye MDF süpürgeliği klipsle monte edeceğim." },
     ],
     calculate: calculateSkirting,
   },
@@ -248,6 +262,7 @@ const tools = {
     title: "Perde Kumaşı Hesaplama",
     subtitle: "Pile oranına göre gereken yaklaşık perde kumaşını bulun.",
     button: "Kumaşı hesapla",
+    showInterpretation: true,
     formGuidance: ["Kornişin tamamını soldan sağa ölçün.", "Hesap, yüksekliği pencereye yeten boydan kumaş içindir.", "Desen tekrarı ve alt-üst kıvırmayı terzinizle ayrıca doğrulayın."],
     fields: [
       { key: "railWidth", label: "Korniş veya ray genişliği", unit: "m", value: 3, min: 0.1, step: 0.1 },
@@ -266,6 +281,7 @@ const tools = {
       },
       { key: "panelCount", label: "Perde parçası", unit: "adet", value: 2, min: 1, step: 1 },
       { key: "patternedFabric", label: "Kumaş büyük desenli", type: "checkbox", value: false },
+      { key: "projectDescription", label: "Projenizi tarif edin", type: "textarea", value: "", placeholder: "Örn. Çok güneş alan salona yere kadar, büyük desenli sık pile fon perde istiyorum." },
     ],
     calculate: calculateCurtain,
   },
@@ -273,6 +289,7 @@ const tools = {
     title: "Elektrik Tüketimi Hesaplama",
     subtitle: "Bir cihazın aylık elektrik tüketimini ve maliyetini hesaplayın.",
     button: "Tüketimi hesapla",
+    showInterpretation: true,
     formGuidance: ["Cihaz gücünü ürün etiketindeki watt değerinden alın.", "Termostatlı cihazlar sürekli tam güçte çalışmayabilir.", "Maliyet için faturanızdaki güncel kWh birim fiyatını kullanın."],
     fields: [
       { key: "watts", label: "Cihaz gücü", unit: "W", value: 1500, min: 0, step: 1 },
@@ -290,6 +307,7 @@ const tools = {
           { value: 0.6, label: "Termostatlı / aralıklı çalışıyor" },
         ],
       },
+      { key: "projectDescription", label: "Kullanımınızı tarif edin", type: "textarea", value: "", placeholder: "Örn. Klimayı yazın günde 8 saat kullanıyorum ama termostatla aralıklı çalışıyor." },
     ],
     calculate: calculateElectricity,
   },
@@ -297,15 +315,15 @@ const tools = {
 
 const multiTools = {
   boya: { label: "Oda", addLabel: "Oda ekle", repeat: ["length", "width", "height", "doorArea", "windowArea", "paintCeiling", "currentCondition", "desiredCondition"] },
-  parke: { label: "Oda", addLabel: "Oda ekle", repeat: ["length", "width", "layoutWaste", "moistureConcern", "floorHeating"] },
-  seramik: { label: "Alan", addLabel: "Alan ekle", repeat: ["applicationType", "length", "width", "excludedArea", "layoutStyle", "tileSizeClass", "wetArea", "surfaceType", "floorHeating"] },
-  "duvar-kagidi": { label: "Duvar grubu", addLabel: "Duvar grubu ekle", repeat: ["totalWallWidth", "wallHeight", "surfaceCondition", "moistureConcern"] },
-  "duvar-paneli": { label: "Duvar", addLabel: "Duvar ekle", repeat: ["wallWidth", "wallHeight", "installationType", "wetArea"] },
-  beton: { label: "Bölüm", addLabel: "Beton bölümü ekle", repeat: ["length", "width", "thickness", "useType"] },
-  tugla: { label: "Duvar", addLabel: "Duvar ekle", repeat: ["wallWidth", "wallHeight", "openingArea", "blockType", "loadBearing"] },
-  supurgelik: { label: "Oda", addLabel: "Oda ekle", repeat: ["length", "width", "doorWidth", "installationType"] },
-  perde: { label: "Pencere", addLabel: "Pencere ekle", repeat: ["railWidth", "panelCount", "patternedFabric"] },
-  elektrik: { label: "Cihaz", addLabel: "Cihaz ekle", repeat: ["watts", "count", "hoursPerDay", "daysPerMonth", "usageMode"] },
+  parke: { label: "Oda", addLabel: "Oda ekle", repeat: ["length", "width", "layoutWaste", "moistureConcern", "floorHeating", "projectDescription"] },
+  seramik: { label: "Alan", addLabel: "Alan ekle", repeat: ["applicationType", "length", "width", "excludedArea", "layoutStyle", "tileSizeClass", "wetArea", "surfaceType", "floorHeating", "projectDescription"] },
+  "duvar-kagidi": { label: "Duvar grubu", addLabel: "Duvar grubu ekle", repeat: ["totalWallWidth", "wallHeight", "surfaceCondition", "moistureConcern", "projectDescription"] },
+  "duvar-paneli": { label: "Duvar", addLabel: "Duvar ekle", repeat: ["wallWidth", "wallHeight", "installationType", "wetArea", "projectDescription"] },
+  beton: { label: "Bölüm", addLabel: "Beton bölümü ekle", repeat: ["length", "width", "thickness", "useType", "projectDescription"] },
+  tugla: { label: "Duvar", addLabel: "Duvar ekle", repeat: ["wallWidth", "wallHeight", "openingArea", "blockType", "loadBearing", "projectDescription"] },
+  supurgelik: { label: "Oda", addLabel: "Oda ekle", repeat: ["length", "width", "doorWidth", "installationType", "projectDescription"] },
+  perde: { label: "Pencere", addLabel: "Pencere ekle", repeat: ["railWidth", "panelCount", "patternedFabric", "projectDescription"] },
+  elektrik: { label: "Cihaz", addLabel: "Cihaz ekle", repeat: ["watts", "count", "hoursPerDay", "daysPerMonth", "usageMode", "projectDescription"] },
 };
 
 const toolTips = {
@@ -447,6 +465,124 @@ function normalizedDescription(value) {
     .replace(/\s+/g, " ");
 }
 
+export function analyzeProjectText(toolId, value) {
+  const text = normalizedDescription(value);
+  if (!text) {
+    return {
+      flags: {},
+      interpretation: "Henüz proje tarifi girilmedi; seçtiğiniz alanlara göre standart uygulama koşullarını esas alıyoruz.",
+      shopping: [],
+      steps: [],
+      checks: [],
+    };
+  }
+
+  const has = (...words) => words.some((word) => text.includes(normalizedDescription(word)));
+  const flags = {
+    moisture: has("nem", "rutubet", "ıslak", "su alıyor", "kabarma"),
+    uneven: has("eğri", "bozuk", "çatlak", "pürüz", "çukur", "kabarık"),
+    existingTile: has("eski seramik", "mevcut seramik", "eski fayans", "fayans üzerine", "seramik üzerine"),
+    underfloorHeating: has("yerden ısıtma", "alttan ısıtma"),
+    diagonal: has("çapraz", "45 derece"),
+    wetArea: has("banyo", "duş", "hamam", "ıslak hacim"),
+    exterior: has("dış mekan", "dış cephe", "balkon", "teras", "bahçe"),
+    largeFormat: has("60x120", "60 x 120", "60 120", "120x120", "120 120", "büyük ebat", "büyük seramik"),
+    newPlaster: has("yeni sıva", "yeni alçı", "ham sıva", "ham alçı"),
+    patterned: has("büyük desen", "desenli", "damarlı", "desen tekrarı"),
+    mechanical: has("klips", "vidalı", "mekanik montaj"),
+    adhesive: has("yapıştır", "mastik"),
+    structural: has("taşıyıcı", "temel", "kolon", "kiriş", "döşeme"),
+    vehicle: has("araç", "otomobil", "otopark", "garaj"),
+    aeratedConcrete: has("gazbeton", "gaz beton", "ytong"),
+    sun: has("çok güneş", "güneş alan", "güneş görüyor"),
+    thermostat: has("termostat", "aralıklı çalış", "devreye girip çık"),
+  };
+
+  const parts = [];
+  const shopping = [];
+  const steps = [];
+  const checks = [];
+  const add = (condition, sentence) => { if (condition) parts.push(sentence); };
+
+  if (toolId === "parke") {
+    add(flags.existingTile, "Mevcut seramik kaplama üzerine parke döşeneceğini");
+    add(flags.moisture, "zeminde nem veya rutubet riski bulunduğunu");
+    add(flags.underfloorHeating, "zeminde yerden ısıtma olduğunu");
+    add(flags.diagonal, "çapraz döşeme istendiğini");
+    if (flags.moisture) checks.push("Nem ölçümü yaptırılmadan ve nem kaynağı çözülmeden parkeyi kapatmayın.");
+    if (flags.existingTile) steps.push("Eski seramiklerin boşluk yapmadığını, temiz ve yeterince düz olduğunu kontrol edin.");
+    if (flags.underfloorHeating) shopping.push("Yerden ısıtmaya uygun parke ve düşük ısıl dirençli şilte");
+  } else if (toolId === "seramik") {
+    add(flags.existingTile, "eski seramik üzerine yeni kaplama yapılacağını");
+    add(flags.wetArea, "uygulamanın ıslak hacimde olduğunu");
+    add(flags.largeFormat, "büyük ebatlı seramik kullanılacağını");
+    add(flags.underfloorHeating, "zeminde yerden ısıtma bulunduğunu");
+    add(flags.exterior, "uygulamanın dış ortam koşullarına açık olduğunu");
+    if (flags.existingTile) shopping.push("Mevcut seramik üzerine uygulamaya uygun aderans astarı");
+    if (flags.largeFormat || flags.underfloorHeating || flags.exterior) shopping.push("Koşullara uygun güçlendirilmiş esnek yapıştırıcı ve derz dolgusu");
+    if (flags.wetArea) steps.push("Kaplama öncesinde köşe bantlarıyla birlikte kesintisiz su yalıtımı oluşturun.");
+  } else if (toolId === "duvar-kagidi") {
+    add(flags.newPlaster, "duvarın yeni sıvalı veya alçılı olduğunu");
+    add(flags.moisture, "duvarda nem veya kabarma riski bulunduğunu");
+    add(flags.patterned, "desen eşleştirmesi gereken bir kâğıt seçildiğini");
+    if (flags.newPlaster) shopping.push("Emiciliği düzenleyen duvar kâğıdı astarı");
+    if (flags.patterned) checks.push("Desen tekrar ölçüsünü rulo etiketinden girin; yalnızca “desenli” ifadesi kesin miktar hesabı için yeterli değildir.");
+    if (flags.moisture) checks.push("Nem kaynağı çözülmeden duvar kâğıdı uygulamayın.");
+  } else if (toolId === "duvar-paneli") {
+    add(flags.mechanical, "panelin klipsli veya mekanik sistemle monte edileceğini");
+    add(flags.adhesive, "yapıştırmalı montaj düşünüldüğünü");
+    add(flags.wetArea || flags.moisture, "uygulama alanında neme maruz kalma riski olduğunu");
+    add(flags.exterior, "panelin dış ortamda kullanılacağını");
+    if (flags.wetArea || flags.exterior) checks.push("Panel, profil ve montaj sisteminin kullanım alanına açıkça uygun olduğunu ürün belgesinden doğrulayın.");
+  } else if (toolId === "beton") {
+    add(flags.vehicle, "beton alanın araç yükü taşıyacağını");
+    add(flags.structural, "uygulamanın taşıyıcı yapı elemanı olabileceğini");
+    add(flags.exterior, "dökümün açık hava koşullarında yapılacağını");
+    if (flags.vehicle || flags.structural) checks.push("Kalınlık, zemin hazırlığı, beton sınıfı ve donatı yalnızca hacim hesabıyla belirlenemez; uzman projelendirmesi gerekir.");
+  } else if (toolId === "tugla") {
+    add(flags.aeratedConcrete, "gazbeton blok kullanılacağını");
+    add(flags.exterior, "duvarın dış ortam koşullarına açık olduğunu");
+    add(flags.structural, "taşıyıcı bir duvar tarif edildiğini");
+    if (flags.aeratedConcrete) shopping.push("Gazbetona uygun ince yatak yapıştırıcısı ve uygulama tarağı");
+    if (flags.exterior || flags.structural) checks.push("Duvar kalınlığı, bağlantı, lento ve ısı-su detaylarını projeden doğrulayın.");
+  } else if (toolId === "supurgelik") {
+    add(flags.mechanical, "süpürgeliğin klipsli veya vidalı monte edileceğini");
+    add(flags.adhesive, "yapıştırmalı montaj düşünüldüğünü");
+    add(flags.moisture, "duvarda veya zeminde nem riski bulunduğunu");
+    if (flags.moisture) checks.push("Nemli bölgede MDF yerine neme dayanıklı bir ürün değerlendirin.");
+  } else if (toolId === "perde") {
+    add(flags.patterned, "kumaşta büyük desen eşleştirmesi gerektiğini");
+    add(flags.sun, "mekânın yoğun güneş aldığını");
+    if (flags.sun) shopping.push("UV dayanımı ve solma direnci kullanım yerine uygun kumaş");
+    if (flags.patterned) checks.push("Kesin desen tekrarını kumaş etiketinden veya satıcıdan alın; yaklaşık ek pay kesim planının yerini tutmaz.");
+  } else if (toolId === "elektrik") {
+    add(flags.thermostat, "cihazın termostatla veya aralıklı çalıştığını");
+    add(has("klima"), "hesabın bir klima kullanımı için yapıldığını");
+    add(has("ısıtıcı", "kombi", "radyatör"), "ısıtma amaçlı bir cihaz kullanıldığını");
+    if (flags.thermostat) checks.push("Gerçek çalışma oranı ortam sıcaklığı ve cihaz ayarına bağlıdır; %60 yalnızca yaklaşık bir kabul olarak kullanılır.");
+  }
+
+  return {
+    flags,
+    interpretation: parts.length
+      ? `${parts.join(", ")} anladık. Öneriyi bu koşullara göre düzenliyoruz.`
+      : "Tarifinizde hesabı değiştiren belirgin bir uygulama koşulu algılamadık; standart koşulları esas alıyoruz.",
+    shopping,
+    steps,
+    checks,
+  };
+}
+
+function applyProjectAnalysis(output, analysis) {
+  output.interpretation = analysis.interpretation;
+  output.masterGuide ||= { shopping: [], steps: [], checks: [] };
+  for (const key of ["shopping", "steps", "checks"]) {
+    const current = output.masterGuide[key] || [];
+    output.masterGuide[key] = [...new Set([...analysis[key], ...current])];
+  }
+  return output;
+}
+
 export function recommendPaintCoats(currentCondition, desiredCondition) {
   const current = normalizedDescription(currentCondition);
   const desired = normalizedDescription(desiredCondition);
@@ -535,13 +671,14 @@ export function recommendPaintCoats(currentCondition, desiredCondition) {
 }
 
 export function calculateParquet(input) {
+  const analysis = analyzeProjectText("parke", input.projectDescription);
   const area = positive(input.length) * positive(input.width);
-  const waste = positive(input.layoutWaste) === 15 ? 15 : 10;
+  const waste = positive(input.layoutWaste) === 15 || analysis.flags.diagonal ? 15 : 10;
   const layoutLabel = waste === 15 ? "Çapraz döşeme" : "Düz döşeme";
   const requiredArea = withWaste(area, waste);
   const packs = Math.ceil(requiredArea / Math.max(0.01, positive(input.packArea)));
 
-  return completedResult(
+  return analyzedResult("parke", input,
     `${trNumber.format(packs)} paket parke`,
     [
       ["Net Zemin Alanı", `${trNumber.format(rounded(area))} m²`],
@@ -556,14 +693,15 @@ export function calculateParquet(input) {
     {
       shopping: [`${trNumber.format(packs)} paket parke`, `${trNumber.format(rounded(requiredArea))} m² parke altı şilte`, "Geçiş profilleri, süpürgelik ve uygun montaj aksesuarları"],
       steps: ["Zeminin düz, kuru ve temiz olduğunu kontrol edin.", "Paketleri uygulama yapılacak ortamda üreticinin önerdiği süre boyunca bekletin.", "Şilteyi serip döşeme yönünü ve ilk sırayı planlayın.", "Parkeyi genleşme boşluğu bırakarak döşeyin; en son süpürgelik ve geçiş profillerini takın."],
-      checks: [input.moistureConcern ? "Nem şüphesi belirttiniz: ölçüm yaptırmadan ve kaynak çözülmeden parke döşemeyin." : "Şap ve zemin nemini uygulama öncesinde kontrol edin.", input.floorHeating ? "Yerden ısıtmaya uygun parke, şilte ve sıcaklık işletme talimatı seçin." : "Yerden ısıtma sonradan planlanıyorsa parke uygunluğunu baştan doğrulayın.", "Kapı açılışı, kot farkı ve sabit dolapları başlamadan kontrol edin."],
+      checks: [input.moistureConcern || analysis.flags.moisture ? "Nem şüphesi belirttiniz: ölçüm yaptırmadan ve kaynak çözülmeden parke döşemeyin." : "Şap ve zemin nemini uygulama öncesinde kontrol edin.", input.floorHeating || analysis.flags.underfloorHeating ? "Yerden ısıtmaya uygun parke, şilte ve sıcaklık işletme talimatı seçin." : "Yerden ısıtma sonradan planlanıyorsa parke uygunluğunu baştan doğrulayın.", "Kapı açılışı, kot farkı ve sabit dolapları başlamadan kontrol edin."],
     }
   );
 }
 
 export function calculateTile(input) {
+  const analysis = analyzeProjectText("seramik", input.projectDescription);
   const applicationLabel = positive(input.applicationType) === 2 ? "Duvar" : "Zemin";
-  const layoutValue = positive(input.layoutStyle);
+  const layoutValue = analysis.flags.diagonal ? 15 : positive(input.layoutStyle);
   const waste = layoutValue >= 15 ? 15 : 10;
   const layoutLabel = layoutValue === 15 ? "Çapraz döşeme" : layoutValue === 16 ? "Deseni takip eden döşeme" : "Düz döşeme";
   const grossArea = positive(input.length) * positive(input.width);
@@ -573,16 +711,18 @@ export function calculateTile(input) {
   const statedBoxArea = positive(input.boxArea);
   const boxArea = statedBoxArea > 0 ? statedBoxArea : 1.44;
   const boxes = Math.ceil(requiredArea / Math.max(0.0001, boxArea));
-  const sizeClass = positive(input.tileSizeClass) || 2;
+  const sizeClass = analysis.flags.largeFormat ? 1 : positive(input.tileSizeClass) || 2;
   const sizeLabel = sizeClass === 1 ? "Büyük" : sizeClass === 3 ? "Küçük / mozaik" : "Orta";
   const adhesiveRate = sizeClass === 1 ? 5 : sizeClass === 3 ? 3.5 : 4;
   const groutRate = sizeClass === 1 ? 0.2 : sizeClass === 3 ? 1 : 0.35;
   const adhesiveKg = area * adhesiveRate;
   const adhesiveBags = Math.ceil(adhesiveKg / 25);
   const groutKg = area * groutRate;
-  const waterproofingKg = input.wetArea ? area * 1.5 : 0;
-  const surfaceType = positive(input.surfaceType) || 1;
-  const adhesiveClass = surfaceType === 2 || sizeClass === 1 || input.floorHeating
+  const wetArea = input.wetArea || analysis.flags.wetArea;
+  const floorHeating = input.floorHeating || analysis.flags.underfloorHeating;
+  const waterproofingKg = wetArea ? area * 1.5 : 0;
+  const surfaceType = analysis.flags.existingTile ? 2 : positive(input.surfaceType) || 1;
+  const adhesiveClass = surfaceType === 2 || sizeClass === 1 || floorHeating || analysis.flags.exterior
     ? "Güçlendirilmiş, esnek seramik yapıştırıcısı"
     : "Uygulama yerine uygun seramik yapıştırıcısı";
   const surfacePreparation = surfaceType === 2
@@ -591,7 +731,7 @@ export function calculateTile(input) {
       ? "Boya ve alçının taşıyıcılığını kontrol edin; gevşek katmanı kaldırıp uygun astar uygulayın."
       : "Şap, sıva veya betonun kürünü, nemini, düzgünlüğünü ve emiciliğini kontrol edin.";
 
-  return completedResult(
+  return analyzedResult("seramik", input,
     `${trNumber.format(boxes)} kutu seramik`,
     [
       ["Uygulama Yeri", applicationLabel],
@@ -604,21 +744,22 @@ export function calculateTile(input) {
       ["Yaklaşık Seramik Yapıştırıcısı", `${trNumber.format(rounded(adhesiveKg, 1))} kg · ${trNumber.format(adhesiveBags)} torba (25 kg)`],
       ["Önerilen Yapıştırıcı Tipi", adhesiveClass],
       ["Yaklaşık Derz Dolgusu", `${trNumber.format(rounded(groutKg, 1))} kg`],
-      ["Seramik Altı Su Yalıtımı", input.wetArea ? `${trNumber.format(rounded(waterproofingKg, 1))} kg` : "Islak alan seçilmedi"],
+      ["Seramik Altı Su Yalıtımı", wetArea ? `${trNumber.format(rounded(waterproofingKg, 1))} kg` : "Islak alan seçilmedi"],
     ],
     statedBoxArea > 0
-      ? `${applicationLabel} için ${layoutLabel.toLocaleLowerCase("tr-TR")} seçiminize göre sistem %${trNumber.format(waste)} uygulama payı ekledi ve ambalajdaki kutu m² bilgisiyle ${trNumber.format(boxes)} kutu hesapladı. ${sizeLabel} seramik seçiminize göre yapıştırıcı ve derz dolgusu yaklaşık olarak hesaplandı. Gerçek sarfiyat tarak ölçüsü, derz genişliği, yüzey düzgünlüğü ve ürün reçetesine göre değişir; ambalaj değerini esas alın.${input.wetArea ? " Islak alan için seramik altı su yalıtımı da ihtiyaca eklendi." : ""} Kutuların ton ve kalibre kodlarını eşleştirin.`
+      ? `${applicationLabel} için ${layoutLabel.toLocaleLowerCase("tr-TR")} seçiminize göre sistem %${trNumber.format(waste)} uygulama payı ekledi ve ambalajdaki kutu m² bilgisiyle ${trNumber.format(boxes)} kutu hesapladı. ${sizeLabel} seramik seçiminize göre yapıştırıcı ve derz dolgusu yaklaşık olarak hesaplandı. Gerçek sarfiyat tarak ölçüsü, derz genişliği, yüzey düzgünlüğü ve ürün reçetesine göre değişir; ambalaj değerini esas alın.${wetArea ? " Islak alan için seramik altı su yalıtımı da ihtiyaca eklendi." : ""} Kutuların ton ve kalibre kodlarını eşleştirin.`
       : `Kutu alanı girilmediği için standart 1,44 m² paket kabul edildi. Satın almadan önce ambalajdaki toplam m² bilgisini doğrulayın.`,
     "Alan ve kutu ihtiyacınız aşağıda.",
     {
-      shopping: [`${trNumber.format(boxes)} kutu seramik`, `${trNumber.format(adhesiveBags)} torba (25 kg) uygun seramik yapıştırıcısı`, `${trNumber.format(rounded(groutKg, 1))} kg derz dolgusu`, input.wetArea ? `${trNumber.format(rounded(waterproofingKg, 1))} kg seramik altı su yalıtımı` : "Islak alan değilse su yalıtımı ihtiyacını yüzeye göre değerlendirin", "Derz artısı/seviye aparatı ve uygun taraklı mala"],
-      steps: [surfacePreparation, input.wetArea ? "Köşe bantlarıyla birlikte su yalıtımını tamamlayıp kurutun." : "Yüzeye uygun astar gerekip gerekmediğini kontrol edin.", "Yerleşimi kuru prova ile planlayın; dar kesimleri görünür köşelere bırakmayın.", "Uygun tarakla yapıştırıcıyı uygulayın; büyük ebatta seramiğin arkasını da destekleyin.", "Yapıştırıcı priz aldıktan sonra derz dolgusunu uygulayın ve yüzeyi temizleyin."],
-      checks: ["Kutuların ton ve kalibre kodları aynı olmalı.", input.wetArea ? "Eğim, süzgeç çevresi ve yalıtım sürekliliğini kaplamadan önce kontrol edin." : "Dış mekân veya don riski varsa uygun ürün sistemini seçin.", input.floorHeating ? "Yerden ısıtmada esnek yapıştırıcı/derz seçin ve sistemi uygulama öncesi kapatın; devreye alma süresini üreticiden doğrulayın." : "Gerçek sarfiyat için yapıştırıcı ve derz ambalajındaki değeri esas alın."],
+      shopping: [`${trNumber.format(boxes)} kutu seramik`, `${trNumber.format(adhesiveBags)} torba (25 kg) uygun seramik yapıştırıcısı`, `${trNumber.format(rounded(groutKg, 1))} kg derz dolgusu`, wetArea ? `${trNumber.format(rounded(waterproofingKg, 1))} kg seramik altı su yalıtımı` : "Islak alan değilse su yalıtımı ihtiyacını yüzeye göre değerlendirin", "Derz artısı/seviye aparatı ve uygun taraklı mala"],
+      steps: [surfacePreparation, wetArea ? "Köşe bantlarıyla birlikte su yalıtımını tamamlayıp kurutun." : "Yüzeye uygun astar gerekip gerekmediğini kontrol edin.", "Yerleşimi kuru prova ile planlayın; dar kesimleri görünür köşelere bırakmayın.", "Uygun tarakla yapıştırıcıyı uygulayın; büyük ebatta seramiğin arkasını da destekleyin.", "Yapıştırıcı priz aldıktan sonra derz dolgusunu uygulayın ve yüzeyi temizleyin."],
+      checks: ["Kutuların ton ve kalibre kodları aynı olmalı.", wetArea ? "Eğim, süzgeç çevresi ve yalıtım sürekliliğini kaplamadan önce kontrol edin." : "Dış mekân veya don riski varsa uygun ürün sistemini seçin.", floorHeating ? "Yerden ısıtmada esnek yapıştırıcı/derz seçin ve sistemi uygulama öncesi kapatın; devreye alma süresini üreticiden doğrulayın." : "Gerçek sarfiyat için yapıştırıcı ve derz ambalajındaki değeri esas alın."],
     }
   );
 }
 
 export function calculateWallpaper(input) {
+  const analysis = analyzeProjectText("duvar-kagidi", input.projectDescription);
   const rollWidthM = positive(input.rollWidth) / 100;
   const repeatM = positive(input.patternRepeat) / 100;
   const trimM = 0.1;
@@ -628,7 +769,7 @@ export function calculateWallpaper(input) {
   const stripsPerRoll = Math.floor(positive(input.rollLength) / Math.max(0.01, stripLength));
 
   if (stripsPerRoll < 1) {
-    return completedResult(
+    return analyzedResult("duvar-kagidi", input,
       "Rulo uzunluğu yetersiz",
       [
         ["Gerekli Şerit Boyu", `${trNumber.format(rounded(stripLength))} m`],
@@ -640,8 +781,9 @@ export function calculateWallpaper(input) {
   }
   const rolls = Math.ceil(stripsNeeded / stripsPerRoll);
   const adhesivePacks = Math.ceil(rolls / 5);
-  const surfaceCondition = positive(input.surfaceCondition) || 1;
-  const preparation = input.moistureConcern
+  const surfaceCondition = analysis.flags.newPlaster ? 2 : positive(input.surfaceCondition) || 1;
+  const moistureConcern = input.moistureConcern || analysis.flags.moisture;
+  const preparation = moistureConcern
     ? "Nem kaynağı çözülmeden uygulamaya başlamayın"
     : surfaceCondition === 2
       ? "Emicilik düzenleyici duvar kâğıdı astarı uygulayın"
@@ -649,7 +791,7 @@ export function calculateWallpaper(input) {
         ? "Çatlakları doldurun, pürüzleri zımparalayın ve yüzeyi astarlayın"
         : "Yüzeyi temizleyin ve sağlam boyayı hafifçe hazırlayın";
 
-  return completedResult(
+  return analyzedResult("duvar-kagidi", input,
     `${trNumber.format(rolls)} rulo duvar kâğıdı`,
     [
       ["Gerekli Şerit Sayısı", `${trNumber.format(stripsNeeded)} adet`],
@@ -664,22 +806,24 @@ export function calculateWallpaper(input) {
     {
       shopping: [`${trNumber.format(rolls)} rulo aynı parti duvar kâğıdı`, `${trNumber.format(adhesivePacks)} paket ürüne uygun tutkal`, "Astar gerekiyorsa yüzeye uygun astar, maket bıçağı, fırça/rulo ve dikiş silindiri"],
       steps: ["Duvarı temizleyin; çatlakları düzeltin ve emiciliği eşitleyin.", "Ruloların parti numaralarını ve desen yönünü kontrol edin.", "İlk şerit için terazili bir düşey çizgi oluşturun.", "Şeritleri desen eşleşmesini koruyarak sırayla yapıştırın.", "Ek yerlerini bastırın; taşan tutkalı ürün talimatına göre temizleyin."],
-      checks: [input.moistureConcern ? "Nem veya kabarma belirttiniz: sorun çözülüp duvar tamamen kurumadan kâğıt uygulamayın." : "Aktif nem veya kabaran duvara kâğıt uygulamayın.", "Tutkal türü kâğıdın tabanına uygun olmalı.", "Tüm ruloları açmadan önce renk ve desen farkını kontrol edin."],
+      checks: [moistureConcern ? "Nem veya kabarma belirttiniz: sorun çözülüp duvar tamamen kurumadan kâğıt uygulamayın." : "Aktif nem veya kabaran duvara kâğıt uygulamayın.", "Tutkal türü kâğıdın tabanına uygun olmalı.", "Tüm ruloları açmadan önce renk ve desen farkını kontrol edin."],
     }
   );
 }
 
 export function calculateWallPanel(input) {
+  const analysis = analyzeProjectText("duvar-paneli", input.projectDescription);
   const waste = 5;
   const columns = Math.ceil(positive(input.wallWidth) / Math.max(0.01, positive(input.panelWidth) / 100));
   const rows = Math.ceil(positive(input.wallHeight) / Math.max(0.01, positive(input.panelHeight) / 100));
   const basePieces = columns * rows;
   const pieces = Math.ceil(withWaste(basePieces, waste));
   const wallArea = positive(input.wallWidth) * positive(input.wallHeight);
-  const mechanicalInstallation = positive(input.installationType) === 2;
+  const mechanicalInstallation = analysis.flags.mechanical || (!analysis.flags.adhesive && positive(input.installationType) === 2);
+  const wetArea = input.wetArea || analysis.flags.wetArea || analysis.flags.moisture;
   const adhesiveTubes = mechanicalInstallation ? 0 : Math.ceil(wallArea / 3);
 
-  return completedResult(
+  return analyzedResult("duvar-paneli", input,
     `${trNumber.format(pieces)} adet panel`,
     [
       ["Net Duvar Alanı", `${trNumber.format(rounded(wallArea))} m²`],
@@ -694,19 +838,20 @@ export function calculateWallPanel(input) {
     {
       shopping: [`${trNumber.format(pieces)} adet panel`, mechanicalInstallation ? "Üreticinin klips, profil ve sabitleme seti" : `${trNumber.format(adhesiveTubes)} kartuş uygun montaj mastiği`, "İç/dış köşe ve bitiş profilleri", "Priz uzatma çerçevesi veya montaj aksesuarları gerekiyorsa uygun parçalar"],
       steps: ["Duvarı ölçüp diklik, düzlük ve nem kontrolü yapın.", "Panel yönünü, başlangıç noktasını ve priz kesimlerini planlayın.", "İlk paneli terazisinde sabitleyin; diğer panelleri sisteme uygun birleştirin.", "Köşe ve bitiş profillerini takıp derzleri kontrol edin."],
-      checks: ["Nemli veya gevşek yüzeye doğrudan yapıştırma yapmayın.", input.wetArea ? "Islak hacim seçtiniz: panel, profil ve yapıştırıcının bu kullanıma açıkça uygun olduğunu doğrulayın." : "Yangın ve ısı kaynağı yakınındaki kullanım uygunluğunu ürün belgesinden kontrol edin.", "Panelin nominal değil gerçek kaplama ölçüsünü esas alın."],
+      checks: ["Nemli veya gevşek yüzeye doğrudan yapıştırma yapmayın.", wetArea ? "Islak hacim seçtiniz: panel, profil ve yapıştırıcının bu kullanıma açıkça uygun olduğunu doğrulayın." : "Yangın ve ısı kaynağı yakınındaki kullanım uygunluğunu ürün belgesinden kontrol edin.", "Panelin nominal değil gerçek kaplama ölçüsünü esas alın."],
     }
   );
 }
 
 export function calculateConcrete(input) {
+  const analysis = analyzeProjectText("beton", input.projectDescription);
   const waste = 8;
   const netVolume = positive(input.length) * positive(input.width) * (positive(input.thickness) / 100);
   const orderVolume = withWaste(netVolume, waste);
   const bags = Math.ceil((orderVolume * 1000) / Math.max(0.1, positive(input.bagYield)));
-  const structural = positive(input.useType) === 2;
+  const structural = positive(input.useType) === 2 || analysis.flags.structural || analysis.flags.vehicle;
 
-  return completedResult(
+  return analyzedResult("beton", input,
     `${trNumber.format(rounded(orderVolume, 2))} m³ beton`,
     [
       ["Net Beton Hacmi", `${trNumber.format(rounded(netVolume, 2))} m³`],
@@ -726,6 +871,7 @@ export function calculateConcrete(input) {
 }
 
 export function calculateBrick(input) {
+  const analysis = analyzeProjectText("tugla", input.projectDescription);
   const waste = 8;
   const grossArea = positive(input.wallWidth) * positive(input.wallHeight);
   const netArea = Math.max(0, grossArea - positive(input.openingArea));
@@ -733,11 +879,12 @@ export function calculateBrick(input) {
   const moduleArea = (positive(input.blockWidth) / 100 + jointM) * (positive(input.blockHeight) / 100 + jointM);
   const basePieces = netArea / Math.max(0.0001, moduleArea);
   const pieces = Math.ceil(withWaste(basePieces, waste));
-  const aeratedConcrete = positive(input.blockType) === 2;
+  const aeratedConcrete = positive(input.blockType) === 2 || analysis.flags.aeratedConcrete;
+  const loadBearing = input.loadBearing || analysis.flags.structural || analysis.flags.exterior;
   const mortarKg = netArea * (aeratedConcrete ? 4 : 20);
   const mortarBags = Math.ceil(mortarKg / 25);
 
-  return completedResult(
+  return analyzedResult("tugla", input,
     `${trNumber.format(pieces)} adet tuğla/blok`,
     [
       ["Brüt Duvar Alanı", `${trNumber.format(rounded(grossArea))} m²`],
@@ -751,21 +898,22 @@ export function calculateBrick(input) {
     {
       shopping: [`${trNumber.format(pieces)} adet tuğla/blok`, `${trNumber.format(mortarBags)} torba (25 kg) yaklaşık örgü harcı`, "Duvar tipine uygun lento, bağlantı elemanı ve donatı gerekiyorsa projedeki ürünler"],
       steps: ["Aksları, kapı-pencere yerlerini ve ilk sıra kotunu işaretleyin.", "İlk sırayı terazisinde kurun; şaşırtma düzenini koruyun.", "Duvarı kademeli yükseltip düşeylik ve yataylığı sık sık kontrol edin.", "Lento, tesisat kanalı ve taşıyıcı bağlantılarını projeye uygun tamamlayın."],
-      checks: [input.loadBearing ? "Taşıyıcı/dış duvar seçtiniz: ürün kalınlığı, ısı-su detayı ve bağlantılar proje ile belirlenmelidir." : "Bölme duvarın döşeme ve tavana doğru şekilde bağlanacağını kontrol edin.", aeratedConcrete ? "Gazbeton için üreticinin ince yatak yapıştırıcısını ve uygulama tarağını kullanın." : "Harç kıvamı ve derz kalınlığını ürün sistemine uygun tutun.", "Kapı-pencere üstü lento ve mevcut yapıya bağlantıyı başlamadan çözün."],
+      checks: [loadBearing ? "Taşıyıcı/dış duvar seçtiniz: ürün kalınlığı, ısı-su detayı ve bağlantılar proje ile belirlenmelidir." : "Bölme duvarın döşeme ve tavana doğru şekilde bağlanacağını kontrol edin.", aeratedConcrete ? "Gazbeton için üreticinin ince yatak yapıştırıcısını ve uygulama tarağını kullanın." : "Harç kıvamı ve derz kalınlığını ürün sistemine uygun tutun.", "Kapı-pencere üstü lento ve mevcut yapıya bağlantıyı başlamadan çözün."],
     }
   );
 }
 
 export function calculateSkirting(input) {
+  const analysis = analyzeProjectText("supurgelik", input.projectDescription);
   const waste = 10;
   const perimeter = 2 * (positive(input.length) + positive(input.width));
   const netLength = Math.max(0, perimeter - positive(input.doorWidth));
   const requiredLength = withWaste(netLength, waste);
   const pieces = Math.ceil(requiredLength / Math.max(0.01, positive(input.pieceLength)));
-  const mechanicalInstallation = positive(input.installationType) === 2;
+  const mechanicalInstallation = analysis.flags.mechanical || (!analysis.flags.adhesive && positive(input.installationType) === 2);
   const adhesiveTubes = mechanicalInstallation ? 0 : Math.ceil(requiredLength / 10);
 
-  return completedResult(
+  return analyzedResult("supurgelik", input,
     `${trNumber.format(pieces)} boy süpürgelik`,
     [
       ["Oda Çevresi", `${trNumber.format(rounded(perimeter))} m`],
@@ -786,21 +934,23 @@ export function calculateSkirting(input) {
 }
 
 export function calculateCurtain(input) {
+  const analysis = analyzeProjectText("perde", input.projectDescription);
   const sideHem = 20;
   const finishedWidth = positive(input.railWidth) * positive(input.fullness);
   const hemAllowance = (sideHem / 100) * Math.max(1, positive(input.panelCount));
-  const patternAllowance = input.patternedFabric ? finishedWidth * 0.1 : 0;
+  const patternedFabric = input.patternedFabric || analysis.flags.patterned;
+  const patternAllowance = patternedFabric ? finishedWidth * 0.1 : 0;
   const fabricMeters = finishedWidth + hemAllowance + patternAllowance;
   const runners = Math.ceil(positive(input.railWidth) * 10);
 
-  return completedResult(
+  return analyzedResult("perde", input,
     `${trNumber.format(rounded(fabricMeters, 1))} metre kumaş`,
     [
       ["Korniş veya Ray Genişliği", `${trNumber.format(rounded(positive(input.railWidth), 1))} m`],
       ["Seçilen Pile Oranı", `${trNumber.format(positive(input.fullness))} kat`],
       ["Pileli Kumaş Genişliği", `${trNumber.format(rounded(finishedWidth, 1))} m`],
       ["Yan Kıvırma Payı", `${trNumber.format(rounded(hemAllowance, 1))} m`],
-      ["Büyük Desen Eşleştirme Payı", input.patternedFabric ? `${trNumber.format(rounded(patternAllowance, 1))} m` : "Eklenmedi"],
+      ["Büyük Desen Eşleştirme Payı", patternedFabric ? `${trNumber.format(rounded(patternAllowance, 1))} m` : "Eklenmedi"],
       ["Önerilen Kumaş Miktarı", `${trNumber.format(rounded(fabricMeters, 1))} m`],
       ["Yaklaşık Perde Ruleti / Düğmesi", `${trNumber.format(runners)} adet`],
     ],
@@ -815,7 +965,8 @@ export function calculateCurtain(input) {
 }
 
 export function calculateElectricity(input) {
-  const usageFactor = positive(input.usageMode) || 1;
+  const analysis = analyzeProjectText("elektrik", input.projectDescription);
+  const usageFactor = analysis.flags.thermostat ? 0.6 : positive(input.usageMode) || 1;
   const monthlyKwh = (positive(input.watts) * positive(input.count) * positive(input.hoursPerDay) * positive(input.daysPerMonth) * usageFactor) / 1000;
   const monthlyCost = monthlyKwh * positive(input.pricePerKwh);
   const annualCost = monthlyCost * 12;
@@ -823,7 +974,7 @@ export function calculateElectricity(input) {
 
   const hasPrice = positive(input.pricePerKwh) > 0;
 
-  return completedResult(
+  return analyzedResult("elektrik", input,
     hasPrice
       ? `${trNumber.format(rounded(monthlyCost, 2))} TL / ay`
       : `${trNumber.format(rounded(monthlyKwh, 2))} kWh / ay`,
@@ -851,6 +1002,13 @@ function completedResult(headline, items, note, subtitle = "Önerilen miktarlar 
   output.readyState = { title: "Hesabınız hazır", subtitle };
   if (masterGuide) output.masterGuide = masterGuide;
   return output;
+}
+
+function analyzedResult(toolId, input, headline, items, note, subtitle = "Önerilen miktarlar aşağıda.", masterGuide) {
+  return applyProjectAnalysis(
+    completedResult(headline, items, note, subtitle, masterGuide),
+    analyzeProjectText(toolId, input.projectDescription)
+  );
 }
 
 function result(headline, eyebrow, items, note) {
@@ -969,7 +1127,8 @@ export function combineMultiResults(toolId, tool, entries) {
     const totalNetArea = entries.reduce((sum, entry) => sum + positive(entry.values.length) * positive(entry.values.width), 0);
     const totalRequiredArea = entries.reduce((sum, entry) => {
       const area = positive(entry.values.length) * positive(entry.values.width);
-      const waste = positive(entry.values.layoutWaste) === 15 ? 15 : 10;
+      const analysis = analyzeProjectText("parke", entry.values.projectDescription);
+      const waste = positive(entry.values.layoutWaste) === 15 || analysis.flags.diagonal ? 15 : 10;
       return sum + withWaste(area, waste);
     }, 0);
     const packArea = Math.max(0.01, positive(entries[0].values.packArea));
@@ -995,17 +1154,18 @@ export function combineMultiResults(toolId, tool, entries) {
 
   if (toolId === "seramik" && entries.every((entry) => entry.values.sameProduct !== false)) {
     const totals = entries.reduce((sum, entry) => {
+      const analysis = analyzeProjectText("seramik", entry.values.projectDescription);
       const grossArea = positive(entry.values.length) * positive(entry.values.width);
       const netArea = Math.max(0, grossArea - Math.min(grossArea, positive(entry.values.excludedArea)));
-      const waste = positive(entry.values.layoutStyle) >= 15 ? 15 : 10;
-      const sizeClass = positive(entry.values.tileSizeClass) || 2;
+      const waste = positive(entry.values.layoutStyle) >= 15 || analysis.flags.diagonal ? 15 : 10;
+      const sizeClass = analysis.flags.largeFormat ? 1 : positive(entry.values.tileSizeClass) || 2;
       const adhesiveRate = sizeClass === 1 ? 5 : sizeClass === 3 ? 3.5 : 4;
       const groutRate = sizeClass === 1 ? 0.2 : sizeClass === 3 ? 1 : 0.35;
       sum.net += netArea;
       sum.required += withWaste(netArea, waste);
       sum.adhesive += netArea * adhesiveRate;
       sum.grout += netArea * groutRate;
-      if (entry.values.wetArea) sum.waterproofing += netArea * 1.5;
+      if (entry.values.wetArea || analysis.flags.wetArea) sum.waterproofing += netArea * 1.5;
       return sum;
     }, { net: 0, required: 0, adhesive: 0, grout: 0, waterproofing: 0 });
     const boxArea = Math.max(0.01, positive(entries[0].values.boxArea));
