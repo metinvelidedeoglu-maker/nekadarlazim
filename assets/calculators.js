@@ -48,6 +48,7 @@ const tools = {
       { key: "length", label: "Oda uzunluğu", unit: "m", value: 5, min: 0.1, step: 0.1 },
       { key: "width", label: "Oda genişliği", unit: "m", value: 4, min: 0.1, step: 0.1 },
       { key: "packArea", label: "Bir paketin kapladığı alan", unit: "m²", value: 1.84, min: 0.1, step: 0.01 },
+      { key: "sameProduct", label: "Tüm odalarda aynı parke kullanılacak", type: "checkbox", value: true },
       {
         key: "layoutWaste",
         label: "Döşeme biçimi",
@@ -716,9 +717,36 @@ function readFields(fields, scope) {
   return { values, error: firstError };
 }
 
-export function combineMultiResults(tool, entries) {
+export function combineMultiResults(toolId, tool, entries) {
   const calculations = entries.map((entry) => ({ name: entry.name, calculation: tool.calculate(entry.values) }));
   if (calculations.length === 1) return calculations[0].calculation;
+
+  if (toolId === "parke" && entries.every((entry) => entry.values.sameProduct !== false)) {
+    const totalNetArea = entries.reduce((sum, entry) => sum + positive(entry.values.length) * positive(entry.values.width), 0);
+    const totalRequiredArea = entries.reduce((sum, entry) => {
+      const area = positive(entry.values.length) * positive(entry.values.width);
+      const waste = positive(entry.values.layoutWaste) === 15 ? 15 : 10;
+      return sum + withWaste(area, waste);
+    }, 0);
+    const packArea = Math.max(0.01, positive(entries[0].values.packArea));
+    const packs = Math.ceil(totalRequiredArea / packArea);
+
+    return {
+      headline: `${trNumber.format(packs)} paket parke`,
+      eyebrow: "Birleştirilmiş paket hesabı",
+      items: [
+        ["Hesaplanan Oda Sayısı", `${entries.length} adet`],
+        ["Toplam Net Zemin Alanı", `${trNumber.format(rounded(totalNetArea))} m²`],
+        ["Uygulama Payı Dahil İhtiyaç", `${trNumber.format(rounded(totalRequiredArea))} m²`],
+        ["Önerilen Toplam Paket", `${trNumber.format(packs)} paket`],
+        ["Paketlerin Toplam Alanı", `${trNumber.format(rounded(packs * packArea))} m²`],
+      ],
+      note: "Tüm odalarda aynı parke kullanılacağı için artan parçaların diğer odalarda değerlendirilebileceği kabul edildi. Oda alanları kendi düz veya çapraz döşeme paylarıyla birleştirildi ve paket sayısı yalnızca bir kez yukarı yuvarlandı.",
+      noteTitle: "Ne Kadar Lazım’ın önerisi",
+      readyState: { title: "Toplu hesabınız hazır", subtitle: "Aynı parke için birleştirilmiş paket ihtiyacı aşağıda." },
+      children: calculations,
+    };
+  }
 
   const headlineParts = calculations.map(({ calculation }) => calculation.headline.match(/^([\d.,]+)\s+(.+)$/)).filter(Boolean);
   let headline = `${calculations.length} bölüm hesaplandı`;
@@ -815,7 +843,7 @@ function initCalculator(root) {
     }
 
     message.hidden = true;
-    const calculation = combineMultiResults(tool, entries);
+    const calculation = combineMultiResults(toolId, tool, entries);
     resultRoot.innerHTML = renderResult(calculation);
     const projectName = form.querySelector('[name="projectName"]').value.trim();
     const text = calculationText(tool, calculation, projectName);
