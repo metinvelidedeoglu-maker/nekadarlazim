@@ -92,6 +92,18 @@ const tools = {
           { value: 16, label: "Deseni takip eden döşeme" },
         ],
       },
+      {
+        key: "tileSizeClass",
+        label: "Seramik boyutu",
+        type: "select",
+        value: 2,
+        options: [
+          { value: 1, label: "Büyük — 60×60 cm ve üzeri" },
+          { value: 2, label: "Orta — 20×20 ile 60×60 cm arası" },
+          { value: 3, label: "Küçük / mozaik — 20×20 cm altı" },
+        ],
+      },
+      { key: "wetArea", label: "Duş, banyo gibi ıslak bir alan", type: "checkbox", value: false },
       { key: "boxArea", label: "Bir kutunun kapladığı alan", unit: "m²", value: 1.44, min: 0.01, step: 0.01 },
       { key: "sameProduct", label: "Tüm alanlarda aynı seramik kullanılacak", type: "checkbox", value: true },
     ],
@@ -207,7 +219,7 @@ const tools = {
 const multiTools = {
   boya: { label: "Oda", addLabel: "Oda ekle", repeat: ["length", "width", "height", "doorArea", "windowArea", "paintCeiling", "currentCondition", "desiredCondition"] },
   parke: { label: "Oda", addLabel: "Oda ekle", repeat: ["length", "width", "layoutWaste"] },
-  seramik: { label: "Alan", addLabel: "Alan ekle", repeat: ["applicationType", "length", "width", "excludedArea", "layoutStyle"] },
+  seramik: { label: "Alan", addLabel: "Alan ekle", repeat: ["applicationType", "length", "width", "excludedArea", "layoutStyle", "tileSizeClass", "wetArea"] },
   "duvar-kagidi": { label: "Duvar grubu", addLabel: "Duvar grubu ekle", repeat: ["totalWallWidth", "wallHeight"] },
   "duvar-paneli": { label: "Duvar", addLabel: "Duvar ekle", repeat: ["wallWidth", "wallHeight"] },
   beton: { label: "Bölüm", addLabel: "Beton bölümü ekle", repeat: ["length", "width", "thickness"] },
@@ -218,15 +230,15 @@ const multiTools = {
 };
 
 const toolTips = {
-  boya: ["Duvarları metre cinsinden ölçün.", "Kapı ve pencerelerin toplam alanını yaklaşık girebilirsiniz.", "Yeni sıva, rutubet ve koyu renk geçişini açıklamada belirtin.", "Tavan boyanmayacaksa işareti kaldırın.", "Aynı boya kullanılacak odaları tek projede toplayın.", "Son kat rengini küçük bir alanda denemek faydalıdır."],
-  parke: ["Paket m² bilgisini ürün ambalajından alın.", "Düz ve çapraz döşemeyi doğru seçin.", "Sabit dolap altında parke olmayacaksa o alanı ölçüden çıkarın.", "Tüm paketlerde aynı üretim serisini tercih edin.", "Artan birkaç parçayı ilerideki onarımlar için saklayın.", "Çok girintili odalarda uygulayıcıyla miktarı doğrulayın."],
+  boya: ["Duvarları metre cinsinden ölçün.", "Kapı ve pencerelerin toplam alanını yaklaşık girebilirsiniz.", "Yeni sıva, rutubet ve koyu renk geçişini açıklamada belirtin.", "Çatlak, delik veya kabarma varsa yüzey tarifine yazın; sistem macun/tamir ihtiyacını hatırlatır.", "Tavan boyanmayacaksa işareti kaldırın.", "Aynı boya kullanılacak odaları tek projede toplayın.", "Son kat rengini küçük bir alanda denemek faydalıdır."],
+  parke: ["Paket m² bilgisini ürün ambalajından alın.", "Düz ve çapraz döşemeyi doğru seçin.", "Sistem parke alanıyla birlikte parke altı şilte ihtiyacını da verir.", "Sabit dolap altında parke olmayacaksa o alanı ölçüden çıkarın.", "Tüm paketlerde aynı üretim serisini tercih edin.", "Artan birkaç parçayı ilerideki onarımlar için saklayın.", "Çok girintili odalarda uygulayıcıyla miktarı doğrulayın."],
   seramik: ["Kutu üzerindeki toplam m² bilgisini esas alın.", "Duvar ve zemini ayrı alanlar olarak ekleyin.", "Kapı, pencere veya kaplanmayacak büyük bölümleri boşluk alanına yazın.", "Ton ve kalibre kodları aynı kutuları seçin.", "Desen veya damarlar devam edecekse ‘Deseni takip eden döşeme’ seçin.", "Niş, kolon ve girintileri ayrı alan olarak ekleyebilirsiniz.", "Islak hacimlerde kaymazlık sınıfını kullanım yerine göre seçin.", "Yedek birkaç seramiği ilerideki onarımlar için saklayın."],
-  "duvar-kagidi": ["Aynı yükseklikteki duvarların genişliklerini toplayabilirsiniz.", "Desen tekrarını rulo etiketinden alın.", "Kapı ve pencereleri çoğu küçük uygulamada düşmemek güvenlidir.", "Farklı parti rulolarda renk tonu değişebilir.", "İlk ve son şeritlerde ek kesim gerekebilir.", "Duvarın en yüksek noktasını ölçün."],
-  "duvar-paneli": ["Nominal değil gerçek kaplama ölçüsünü kullanın.", "Her duvarı ayrı eklemek köşe kesimlerini daha doğru gösterir.", "Priz ve anahtar yerlerini önceden işaretleyin.", "Köşe profillerini ayrıca planlayın.", "Panelleri montajdan önce ortamda dinlendirin.", "Kesim yönünü ürün desenine göre belirleyin."],
+  "duvar-kagidi": ["Aynı yükseklikteki duvarların genişliklerini toplayabilirsiniz.", "Desen tekrarını rulo etiketinden alın.", "Tutkal paketinin kaç rulo kapladığını ambalajından doğrulayın.", "Kapı ve pencereleri çoğu küçük uygulamada düşmemek güvenlidir.", "Farklı parti rulolarda renk tonu değişebilir.", "İlk ve son şeritlerde ek kesim gerekebilir.", "Duvarın en yüksek noktasını ölçün."],
+  "duvar-paneli": ["Nominal değil gerçek kaplama ölçüsünü kullanın.", "Her duvarı ayrı eklemek köşe kesimlerini daha doğru gösterir.", "Yapıştırmalı sistemde mastik hesabını, klipsli sistemde üretici aksesuar listesini esas alın.", "Priz ve anahtar yerlerini önceden işaretleyin.", "Köşe profillerini ayrıca planlayın.", "Panelleri montajdan önce ortamda dinlendirin.", "Kesim yönünü ürün desenine göre belirleyin."],
   beton: ["Kalınlığı santimetre olarak girin.", "Farklı kalınlıktaki bölümleri ayrı ekleyin.", "Zemindeki kot farklarını ölçün.", "Torba verimini ambalajdan doğrulayın.", "Taşıyıcı işlerde mühendis görüşü alın.", "Pompa ve taşıma kayıplarını tedarikçiyle konuşun."],
-  tugla: ["Her duvarı ayrı ölçmek hata riskini azaltır.", "Kapı ve pencere boşluklarını çıkarın.", "Ürünün duvar yüzünde görünen ölçülerini kullanın.", "Derz kalınlığını uygulama sistemine göre seçin.", "Kırılma için yedek ürün bulundurun.", "Harç veya yapıştırıcı ihtiyacını ayrıca planlayın."],
-  supurgelik: ["Her odayı ayrı ekleyin.", "Süpürgelik gelmeyecek kapı genişliklerini çıkarın.", "Ürünün gerçek boyunu ambalajdan alın.", "Çok köşeli odalarda kesim artar.", "Köşe ve bitiş aksesuarlarını ayrıca sayın.", "Parke ile uyumlu seriyi önceden kontrol edin."],
-  perde: ["Kornişi duvardan duvara değil, gerçek ray boyunca ölçün.", "Her pencereyi ayrı ekleyin.", "Pile oranı arttıkça kumaş ihtiyacı artar.", "Desen tekrarlı kumaşlarda ek pay gerekebilir.", "Kumaş yüksekliğinin pencereye yettiğini kontrol edin.", "Kesimden önce ölçüyü terzinizle doğrulayın."],
+  tugla: ["Her duvarı ayrı ölçmek hata riskini azaltır.", "Kapı ve pencere boşluklarını çıkarın.", "Ürünün duvar yüzünde görünen ölçülerini kullanın.", "Sistem standart duvar örgü harcını yaklaşık hesaplar; gazbeton yapıştırıcısında ambalaj değerini esas alın.", "Kırılma için yedek ürün bulundurun.", "Özel derz uygulamalarını ustanızla doğrulayın."],
+  supurgelik: ["Her odayı ayrı ekleyin.", "Süpürgelik gelmeyecek kapı genişliklerini çıkarın.", "Ürünün gerçek boyunu ambalajdan alın.", "Yapıştırmalı montaj için mastik hesabı sonuçta ayrıca gösterilir.", "Çok köşeli odalarda kesim artar.", "Köşe ve bitiş aksesuarlarını ayrıca sayın.", "Parke ile uyumlu seriyi önceden kontrol edin."],
+  perde: ["Kornişi duvardan duvara değil, gerçek ray boyunca ölçün.", "Her pencereyi ayrı ekleyin.", "Pile oranı arttıkça kumaş ihtiyacı artar.", "Sistem yaklaşık perde ruleti/düğmesi ihtiyacını da verir.", "Desen tekrarlı kumaşlarda ek pay gerekebilir.", "Kumaş yüksekliğinin pencereye yettiğini kontrol edin.", "Kesimden önce ölçüyü terzinizle doğrulayın."],
   elektrik: ["Her farklı cihazı ayrı ekleyin.", "Watt değerini cihaz etiketinden alın.", "Termostatlı cihazların sürekli tam güç çekmediğini unutmayın.", "Bekleme tüketimi gerçek sonucu artırabilir.", "Güncel birim fiyatı faturanızdan alın.", "Kademeli tarife ve vergiler faturayı değiştirebilir."],
 };
 
@@ -273,6 +285,8 @@ export function calculatePaint(input) {
   const waste = 10;
   const primerCoverage = 10;
   const recommendation = recommendPaintCoats(input.currentCondition, input.desiredCondition);
+  const surfaceText = normalizedDescription(`${input.currentCondition || ""} ${input.desiredCondition || ""}`);
+  const repairNeeded = /catlak|delik|yama|kabarm|dokul/.test(surfaceText);
   const wallCoats = recommendation.coats;
   const ceilingCoats = input.paintCeiling === false ? 0 : 2;
   const grossArea = 2 * (positive(input.length) + positive(input.width)) * positive(input.height);
@@ -314,6 +328,7 @@ export function calculatePaint(input) {
       ["Net Tavan Alanı", `${trNumber.format(rounded(ceilingArea))} m²`],
       ["Tavan Boyası Kaç Kat Uygulanmalı", ceilingStatus],
       ["Tavan İçin Önerilen Boya Miktarı", ceilingAmount],
+      ["Yüzey Düzeltme Malzemesi", repairNeeded ? "Macun / tamir harcı gerekebilir" : "Belirgin ihtiyaç algılanmadı"],
     ],
     `${recommendation.warning} ${recommendation.reason} Duvar için ${wallCoats} kat ve yaklaşık ${trNumber.format(rounded(wallLiters, 1))} litre boya hesapladık. ${primerAdvice} ${ceilingAdvice} İstediğiniz renk tonunu mağazada markanın kartelasından seçip hazırlatabilir, ürünün ambalaj seçeneklerine göre miktarı yukarı tamamlayabilirsiniz.`.trim()
   );
@@ -439,6 +454,7 @@ export function calculateParquet(input) {
       ["Fire Dahil Parke İhtiyacı", `${trNumber.format(rounded(requiredArea))} m²`],
       ["Önerilen Paket Sayısı", `${trNumber.format(packs)} paket`],
       ["Paketlerin Toplam Alanı", `${trNumber.format(rounded(packs * positive(input.packArea)))} m²`],
+      ["Parke Altı Şilte", `${trNumber.format(rounded(requiredArea))} m²`],
     ],
     `${layoutLabel} seçiminize uygun %${trNumber.format(waste)} kesim payı sistem tarafından eklendi ve ${trNumber.format(packs)} paket parke hesaplandı. Paket alanını satın alacağınız ürünün ambalajından doğrulayın; oda çok köşeliyse uygulayıcınıza danışın.`,
     "Zemin ve paket ihtiyacınız aşağıda."
@@ -457,6 +473,14 @@ export function calculateTile(input) {
   const statedBoxArea = positive(input.boxArea);
   const boxArea = statedBoxArea > 0 ? statedBoxArea : 1.44;
   const boxes = Math.ceil(requiredArea / Math.max(0.0001, boxArea));
+  const sizeClass = positive(input.tileSizeClass) || 2;
+  const sizeLabel = sizeClass === 1 ? "Büyük" : sizeClass === 3 ? "Küçük / mozaik" : "Orta";
+  const adhesiveRate = sizeClass === 1 ? 5 : sizeClass === 3 ? 3.5 : 4;
+  const groutRate = sizeClass === 1 ? 0.2 : sizeClass === 3 ? 1 : 0.35;
+  const adhesiveKg = area * adhesiveRate;
+  const adhesiveBags = Math.ceil(adhesiveKg / 25);
+  const groutKg = area * groutRate;
+  const waterproofingKg = input.wetArea ? area * 1.5 : 0;
 
   return completedResult(
     `${trNumber.format(boxes)} kutu seramik`,
@@ -468,9 +492,12 @@ export function calculateTile(input) {
       ["Bir Kutunun Kapladığı Alan", `${trNumber.format(rounded(boxArea))} m²`],
       ["Önerilen Kutu Sayısı", `${trNumber.format(boxes)} kutu`],
       ["Satın Alınan Toplam Alan", `${trNumber.format(rounded(boxes * boxArea))} m²`],
+      ["Yaklaşık Seramik Yapıştırıcısı", `${trNumber.format(rounded(adhesiveKg, 1))} kg · ${trNumber.format(adhesiveBags)} torba (25 kg)`],
+      ["Yaklaşık Derz Dolgusu", `${trNumber.format(rounded(groutKg, 1))} kg`],
+      ["Seramik Altı Su Yalıtımı", input.wetArea ? `${trNumber.format(rounded(waterproofingKg, 1))} kg` : "Islak alan seçilmedi"],
     ],
     statedBoxArea > 0
-      ? `${applicationLabel} için ${layoutLabel.toLocaleLowerCase("tr-TR")} seçiminize göre sistem %${trNumber.format(waste)} uygulama payı ekledi ve ambalajdaki kutu m² bilgisiyle ${trNumber.format(boxes)} kutu hesapladı. Kutuların ton ve kalibre kodlarını eşleştirin.`
+      ? `${applicationLabel} için ${layoutLabel.toLocaleLowerCase("tr-TR")} seçiminize göre sistem %${trNumber.format(waste)} uygulama payı ekledi ve ambalajdaki kutu m² bilgisiyle ${trNumber.format(boxes)} kutu hesapladı. ${sizeLabel} seramik seçiminize göre yapıştırıcı ve derz dolgusu yaklaşık olarak hesaplandı. Gerçek sarfiyat tarak ölçüsü, derz genişliği, yüzey düzgünlüğü ve ürün reçetesine göre değişir; ambalaj değerini esas alın.${input.wetArea ? " Islak alan için seramik altı su yalıtımı da ihtiyaca eklendi." : ""} Kutuların ton ve kalibre kodlarını eşleştirin.`
       : `Kutu alanı girilmediği için standart 1,44 m² paket kabul edildi. Satın almadan önce ambalajdaki toplam m² bilgisini doğrulayın.`,
     "Alan ve kutu ihtiyacınız aşağıda."
   );
@@ -497,6 +524,7 @@ export function calculateWallpaper(input) {
     );
   }
   const rolls = Math.ceil(stripsNeeded / stripsPerRoll);
+  const adhesivePacks = Math.ceil(rolls / 5);
 
   return completedResult(
     `${trNumber.format(rolls)} rulo duvar kâğıdı`,
@@ -505,8 +533,9 @@ export function calculateWallpaper(input) {
       ["Bir Şeridin Kesim Boyu", `${trNumber.format(rounded(stripLength))} m`],
       ["Bir Rulodan Çıkan Şerit", `${trNumber.format(stripsPerRoll)} adet`],
       ["Önerilen Rulo Sayısı", `${trNumber.format(rolls)} rulo`],
+      ["Yaklaşık Duvar Kâğıdı Tutkalı", `${trNumber.format(adhesivePacks)} paket`],
     ],
-    `Duvar yüksekliği, kesim payı ve desen tekrarına göre bir rulodan ${trNumber.format(stripsPerRoll)} tam şerit çıkıyor. Toplam ${trNumber.format(rolls)} rulo öneriyoruz; desen eşleştirme ve duvar girintileri ihtiyacı artırabilir.`,
+    `Duvar yüksekliği, kesim payı ve desen tekrarına göre bir rulodan ${trNumber.format(stripsPerRoll)} tam şerit çıkıyor. Toplam ${trNumber.format(rolls)} rulo ve yaklaşık ${trNumber.format(adhesivePacks)} paket tutkal öneriyoruz. Tutkalın kaplama gücü ürüne göre değiştiği için ambalaj bilgisini doğrulayın; desen eşleştirme ve duvar girintileri ihtiyacı artırabilir.`,
     "Şerit ve rulo ihtiyacınız aşağıda."
   );
 }
@@ -518,6 +547,7 @@ export function calculateWallPanel(input) {
   const basePieces = columns * rows;
   const pieces = Math.ceil(withWaste(basePieces, waste));
   const wallArea = positive(input.wallWidth) * positive(input.wallHeight);
+  const adhesiveTubes = Math.ceil(wallArea / 3);
 
   return completedResult(
     `${trNumber.format(pieces)} adet panel`,
@@ -526,8 +556,9 @@ export function calculateWallPanel(input) {
       ["Yatayda Gereken Panel", `${trNumber.format(columns)} adet`],
       ["Dikeyde Gereken Sıra", `${trNumber.format(rows)} sıra`],
       ["Fire Dahil Önerilen Panel", `${trNumber.format(pieces)} adet`],
+      ["Yapıştırmalı Montaj İçin Mastik", `${trNumber.format(adhesiveTubes)} kartuş`],
     ],
-    `Panellerin dikey yerleşimine ve sistemin eklediği standart %${trNumber.format(waste)} yedek payına göre ${trNumber.format(pieces)} adet panel öneriyoruz. Geçme payları, prizler ve köşe kesimleri için ürünün gerçek kaplama ölçüsünü doğrulayın.`,
+    `Panellerin dikey yerleşimine ve sistemin eklediği standart %${trNumber.format(waste)} yedek payına göre ${trNumber.format(pieces)} adet panel öneriyoruz. Yapıştırmalı montaj için yaklaşık ${trNumber.format(adhesiveTubes)} kartuş mastik öngörüldü; mekanik veya klipsli sistemde bu miktarı dikkate almayın. Geçme payları, prizler ve köşe kesimleri için ürünün gerçek kaplama ölçüsünü doğrulayın.`,
     "Duvar ve panel ihtiyacınız aşağıda."
   );
 }
@@ -559,6 +590,8 @@ export function calculateBrick(input) {
   const moduleArea = (positive(input.blockWidth) / 100 + jointM) * (positive(input.blockHeight) / 100 + jointM);
   const basePieces = netArea / Math.max(0.0001, moduleArea);
   const pieces = Math.ceil(withWaste(basePieces, waste));
+  const mortarKg = netArea * 20;
+  const mortarBags = Math.ceil(mortarKg / 25);
 
   return completedResult(
     `${trNumber.format(pieces)} adet tuğla/blok`,
@@ -567,8 +600,9 @@ export function calculateBrick(input) {
       ["Net Örülecek Alan", `${trNumber.format(rounded(netArea))} m²`],
       ["Metrekare Başına Ürün", `${trNumber.format(rounded(1 / Math.max(0.0001, moduleArea), 1))} adet`],
       ["Fire Dahil Önerilen Adet", `${trNumber.format(pieces)} adet`],
+      ["Yaklaşık Duvar Örgü Harcı", `${trNumber.format(rounded(mortarKg))} kg · ${trNumber.format(mortarBags)} torba (25 kg)`],
     ],
-    `Kapı ve pencere alanları çıkarıldı; standart 10 mm derz ve %${trNumber.format(waste)} kırılma payı sistem tarafından uygulandı. Yaklaşık ${trNumber.format(pieces)} adet ürün gerekir; özel uygulamalarda ürün ölçüsü ve derzi üretici tavsiyesine göre doğrulayın.`,
+    `Kapı ve pencere alanları çıkarıldı; standart 10 mm derz ve %${trNumber.format(waste)} kırılma payı sistem tarafından uygulandı. Yaklaşık ${trNumber.format(pieces)} adet ürün ve ${trNumber.format(mortarBags)} torba duvar örgü harcı gerekir. Harç tüketimi blok türü ve uygulamaya göre önemli ölçüde değişebilir; üretici değerini doğrulayın.`,
     "Duvar alanı ve ürün ihtiyacınız aşağıda."
   );
 }
@@ -579,6 +613,7 @@ export function calculateSkirting(input) {
   const netLength = Math.max(0, perimeter - positive(input.doorWidth));
   const requiredLength = withWaste(netLength, waste);
   const pieces = Math.ceil(requiredLength / Math.max(0.01, positive(input.pieceLength)));
+  const adhesiveTubes = Math.ceil(requiredLength / 10);
 
   return completedResult(
     `${trNumber.format(pieces)} boy süpürgelik`,
@@ -588,8 +623,9 @@ export function calculateSkirting(input) {
       ["Fire Dahil Süpürgelik İhtiyacı", `${trNumber.format(rounded(requiredLength))} m`],
       ["Önerilen Ürün Boyu", `${trNumber.format(pieces)} boy`],
       ["Satın Alınan Toplam Uzunluk", `${trNumber.format(rounded(pieces * positive(input.pieceLength)))} m`],
+      ["Yapıştırmalı Montaj İçin Mastik", `${trNumber.format(adhesiveTubes)} kartuş`],
     ],
-    `Kapı açıklıkları çıkarılıp sistem tarafından standart %${trNumber.format(waste)} kesim payı eklendi. ${trNumber.format(pieces)} boy süpürgelik öneriyoruz; köşe sayısı arttıkça kesim kaybı da artabilir.`,
+    `Kapı açıklıkları çıkarılıp sistem tarafından standart %${trNumber.format(waste)} kesim payı eklendi. ${trNumber.format(pieces)} boy süpürgelik ve yapıştırmalı montaj için yaklaşık ${trNumber.format(adhesiveTubes)} kartuş mastik öneriyoruz; klipsli üründe mastik hesabını dikkate almayın.`,
     "Çevre ve süpürgelik ihtiyacınız aşağıda."
   );
 }
@@ -599,6 +635,7 @@ export function calculateCurtain(input) {
   const finishedWidth = positive(input.railWidth) * positive(input.fullness);
   const hemAllowance = (sideHem / 100) * Math.max(1, positive(input.panelCount));
   const fabricMeters = finishedWidth + hemAllowance;
+  const runners = Math.ceil(positive(input.railWidth) * 10);
 
   return completedResult(
     `${trNumber.format(rounded(fabricMeters, 1))} metre kumaş`,
@@ -608,6 +645,7 @@ export function calculateCurtain(input) {
       ["Pileli Kumaş Genişliği", `${trNumber.format(rounded(finishedWidth, 1))} m`],
       ["Yan Kıvırma Payı", `${trNumber.format(rounded(hemAllowance, 1))} m`],
       ["Önerilen Kumaş Miktarı", `${trNumber.format(rounded(fabricMeters, 1))} m`],
+      ["Yaklaşık Perde Ruleti / Düğmesi", `${trNumber.format(runners)} adet`],
     ],
     `Seçtiğiniz ${trNumber.format(positive(input.fullness))} kat pile ve yan kıvırma payıyla yaklaşık ${trNumber.format(rounded(fabricMeters, 1))} metre boydan kumaş gerekir. Kumaş yüksekliği, desen tekrarı ve alt-üst kıvırma payını terzinizle doğrulayın.`,
     "Pile ve kumaş ihtiyacınız aşağıda."
@@ -770,6 +808,7 @@ export function combineMultiResults(toolId, tool, entries) {
         ["Uygulama Payı Dahil İhtiyaç", `${trNumber.format(rounded(totalRequiredArea))} m²`],
         ["Önerilen Toplam Paket", `${trNumber.format(packs)} paket`],
         ["Paketlerin Toplam Alanı", `${trNumber.format(rounded(packs * packArea))} m²`],
+        ["Parke Altı Şilte", `${trNumber.format(rounded(totalRequiredArea))} m²`],
       ],
       note: "Tüm odalarda aynı parke kullanılacağı için artan parçaların diğer odalarda değerlendirilebileceği kabul edildi. Oda alanları kendi düz veya çapraz döşeme paylarıyla birleştirildi ve paket sayısı yalnızca bir kez yukarı yuvarlandı.",
       noteTitle: "Ne Kadar Lazım’ın önerisi",
@@ -783,10 +822,16 @@ export function combineMultiResults(toolId, tool, entries) {
       const grossArea = positive(entry.values.length) * positive(entry.values.width);
       const netArea = Math.max(0, grossArea - Math.min(grossArea, positive(entry.values.excludedArea)));
       const waste = positive(entry.values.layoutStyle) >= 15 ? 15 : 10;
+      const sizeClass = positive(entry.values.tileSizeClass) || 2;
+      const adhesiveRate = sizeClass === 1 ? 5 : sizeClass === 3 ? 3.5 : 4;
+      const groutRate = sizeClass === 1 ? 0.2 : sizeClass === 3 ? 1 : 0.35;
       sum.net += netArea;
       sum.required += withWaste(netArea, waste);
+      sum.adhesive += netArea * adhesiveRate;
+      sum.grout += netArea * groutRate;
+      if (entry.values.wetArea) sum.waterproofing += netArea * 1.5;
       return sum;
-    }, { net: 0, required: 0 });
+    }, { net: 0, required: 0, adhesive: 0, grout: 0, waterproofing: 0 });
     const boxArea = Math.max(0.01, positive(entries[0].values.boxArea));
     const boxes = Math.ceil(totals.required / boxArea);
 
@@ -799,8 +844,11 @@ export function combineMultiResults(toolId, tool, entries) {
         ["Uygulama Payı Dahil İhtiyaç", `${trNumber.format(rounded(totals.required))} m²`],
         ["Önerilen Toplam Kutu", `${trNumber.format(boxes)} kutu`],
         ["Kutuların Toplam Alanı", `${trNumber.format(rounded(boxes * boxArea))} m²`],
+        ["Yaklaşık Seramik Yapıştırıcısı", `${trNumber.format(rounded(totals.adhesive, 1))} kg · ${trNumber.format(Math.ceil(totals.adhesive / 25))} torba (25 kg)`],
+        ["Yaklaşık Derz Dolgusu", `${trNumber.format(rounded(totals.grout, 1))} kg`],
+        ["Seramik Altı Su Yalıtımı", totals.waterproofing > 0 ? `${trNumber.format(rounded(totals.waterproofing, 1))} kg` : "Islak alan seçilmedi"],
       ],
-      note: "Tüm alanlarda aynı seramik kullanılacağı için kesimden artan parçaların diğer alanlarda değerlendirilebileceği kabul edildi. Her alanın döşeme biçimine uygun payı ayrı hesaplandı, ihtiyaçlar birleştirildi ve kutu sayısı yalnızca bir kez yukarı yuvarlandı. Satın alırken tüm kutuların ton ve kalibre kodlarının aynı olmasına dikkat edin.",
+      note: "Tüm alanlarda aynı seramik kullanılacağı için kesimden artan parçaların diğer alanlarda değerlendirilebileceği kabul edildi. Her alanın döşeme biçimine uygun payı ayrı hesaplandı, ihtiyaçlar birleştirildi ve kutu sayısı yalnızca bir kez yukarı yuvarlandı. Yapıştırıcı, derz ve varsa su yalıtımı alanların özelliklerine göre yaklaşık hesaplandı; satın alırken ürün ambalajındaki sarfiyatı ve tüm kutuların ton-kalibre kodlarını doğrulayın.",
       noteTitle: "Ne Kadar Lazım’ın önerisi",
       readyState: { title: "Toplu hesabınız hazır", subtitle: "Aynı seramik için birleştirilmiş kutu ihtiyacı aşağıda." },
       children: calculations,
