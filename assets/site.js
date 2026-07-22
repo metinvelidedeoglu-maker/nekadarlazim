@@ -62,7 +62,26 @@ function initShoppingList() {
           <button class="shopping-list-close" type="button" aria-label="Listeyi kapat">×</button>
         </header>
         <div class="shopping-list-content"></div>
+        <section class="quote-panel" hidden>
+          <div class="quote-panel-heading">
+            <span class="shopping-list-eyebrow">İlk adım ücretsiz</span>
+            <h3>Satıcıdan teklif alın</h3>
+            <p>Listenizdeki hesapları ve iletişim bilgilerinizi girin. Talep, seçtiğiniz satıcıya gönderilmek üzere e-posta taslağına dönüştürülür.</p>
+          </div>
+          <form class="quote-form">
+            <label class="quote-field"><span>Satıcının e-posta adresi</span><input name="quoteSellerEmail" type="email" maxlength="160" autocomplete="email" required></label>
+            <label class="quote-field"><span>Adınız soyadınız</span><input name="quoteName" type="text" maxlength="100" autocomplete="name" required></label>
+            <label class="quote-field"><span>E-posta adresiniz</span><input name="quoteEmail" type="email" maxlength="160" autocomplete="email" required></label>
+            <label class="quote-field"><span>Telefon <small>(isteğe bağlı)</small></span><input name="quotePhone" type="tel" maxlength="40" autocomplete="tel"></label>
+            <label class="quote-field"><span>İl / ilçe <small>(isteğe bağlı)</small></span><input name="quoteLocation" type="text" maxlength="100" autocomplete="address-level2"></label>
+            <label class="quote-field quote-field-wide"><span>Notunuz <small>(isteğe bağlı)</small></span><textarea name="quoteNote" rows="3" maxlength="500" placeholder="Örn. Uygulama dahil fiyat ve uygun teslim tarihini de öğrenmek istiyorum."></textarea></label>
+            <p class="quote-disclaimer">Gönder düğmesi, listenizi içeren bir e-posta taslağı açar. Göndermeden önce bilgileri kontrol edebilirsiniz.</p>
+            <div class="quote-form-actions"><button class="list-secondary quote-cancel" type="button">Listeye dön</button><button class="list-primary" type="submit">Teklif isteğini hazırla</button></div>
+            <p class="quote-status" role="status" hidden></p>
+          </form>
+        </section>
         <footer class="shopping-list-footer">
+          <button class="list-primary quote-open" type="button">Satıcıdan teklif iste</button>
           <button class="list-secondary list-clear" type="button">Listeyi temizle</button>
           <button class="list-primary list-share" type="button">Paylaş / kopyala</button>
         </footer>
@@ -75,6 +94,11 @@ function initShoppingList() {
   const closeButton = dialog.querySelector(".shopping-list-close");
   const count = trigger.querySelector(".shopping-list-count");
   const content = dialog.querySelector(".shopping-list-content");
+  const quotePanel = dialog.querySelector(".quote-panel");
+  const quoteForm = dialog.querySelector(".quote-form");
+  const quoteOpenButton = dialog.querySelector(".quote-open");
+  const quoteCancelButton = dialog.querySelector(".quote-cancel");
+  const quoteStatus = dialog.querySelector(".quote-status");
   const clearButton = dialog.querySelector(".list-clear");
   const shareButton = dialog.querySelector(".list-share");
   let currentItems = readShoppingList();
@@ -84,6 +108,7 @@ function initShoppingList() {
     count.textContent = String(items.length);
     count.setAttribute("aria-label", `${items.length} kayıt`);
     trigger.classList.toggle("has-items", items.length > 0);
+    quoteOpenButton.disabled = items.length === 0;
     clearButton.disabled = items.length === 0;
     shareButton.disabled = items.length === 0;
 
@@ -108,6 +133,7 @@ function initShoppingList() {
   }
 
   function openDialog() {
+    showListPanel();
     render();
     if (typeof dialog.showModal === "function") dialog.showModal();
     else dialog.setAttribute("open", "");
@@ -116,6 +142,26 @@ function initShoppingList() {
   function closeDialog() {
     if (typeof dialog.close === "function") dialog.close();
     else dialog.removeAttribute("open");
+  }
+
+  function showListPanel() {
+    content.hidden = false;
+    quotePanel.hidden = true;
+    quoteOpenButton.hidden = false;
+    clearButton.hidden = false;
+    shareButton.hidden = false;
+    quoteStatus.hidden = true;
+  }
+
+  function showQuotePanel() {
+    if (!currentItems.length) return;
+    content.hidden = true;
+    quotePanel.hidden = false;
+    quoteOpenButton.hidden = true;
+    clearButton.hidden = true;
+    shareButton.hidden = true;
+    quoteStatus.hidden = true;
+    quoteForm.querySelector('[name="quoteName"]').focus();
   }
 
   trigger.addEventListener("click", openDialog);
@@ -128,6 +174,40 @@ function initShoppingList() {
     const removeButton = event.target.closest("[data-remove-item]");
     if (!removeButton) return;
     render(removeShoppingItem(removeButton.dataset.removeItem));
+  });
+
+  quoteOpenButton.addEventListener("click", showQuotePanel);
+  quoteCancelButton.addEventListener("click", showListPanel);
+
+  quoteForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!quoteForm.reportValidity()) return;
+
+    const formData = new FormData(quoteForm);
+    const sellerEmail = String(formData.get("quoteSellerEmail") || "").trim();
+    const name = String(formData.get("quoteName") || "").trim();
+    const email = String(formData.get("quoteEmail") || "").trim();
+    const phone = String(formData.get("quotePhone") || "").trim();
+    const location = String(formData.get("quoteLocation") || "").trim();
+    const note = String(formData.get("quoteNote") || "").trim();
+    const subject = `Teklif talebi — ${name}`;
+    const body = [
+      "Merhaba,",
+      "",
+      "Ne Kadar Lazım? üzerinden aşağıdaki ihtiyaçlarım için teklif almak istiyorum.",
+      "",
+      `Ad soyad: ${name}`,
+      `E-posta: ${email}`,
+      `Telefon: ${phone || "Belirtilmedi"}`,
+      `İl / ilçe: ${location || "Belirtilmedi"}`,
+      `Not: ${note || "Belirtilmedi"}`,
+      "",
+      formatShoppingListText(currentItems),
+    ].join("\n");
+
+    quoteStatus.textContent = "E-posta taslağı açılıyor…";
+    quoteStatus.hidden = false;
+    window.location.href = `mailto:${sellerEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   });
 
   clearButton.addEventListener("click", () => {
